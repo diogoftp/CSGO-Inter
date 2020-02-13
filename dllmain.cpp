@@ -1,19 +1,21 @@
 #include <iostream>
 #include <atlbase.h>
+	
 #include <time.h>
 //#include <dwmapi.h>
 //#pragma comment(lib, "dwmapi.lib")
 
-#include "SDK.hpp"
+#include "SDK/SDK.hpp"
 #include "xor.hpp"
 #include "interfaces.hpp"
+#include "netvars.hpp"
 
 #include "gui.hpp"
 #include "ESP.hpp"
 #include "radar.hpp"
 #include "aimbot.hpp"
 
-#define DEBUG1 1
+//#define DEBUG1 1
 
 // Data
 LPDIRECT3D9              g_pD3D = NULL;
@@ -34,7 +36,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	float aimbotFOV = 3.0f;
 	float aimbotSmooth = 4.0f;
 	bool bRadar = false, bESP = false, bMenu = true;
-	char* testint;
 	//End GUI Setup
 
 	USES_CONVERSION;
@@ -64,10 +65,8 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 	EntList* entityList = (EntList*)pEntityList;
 
-	//Interfaces Setup
-	IBaseClientDLL* g_BaseClientDLL = (IBaseClientDLL*)EasyInterface("client_panorama.dll", "VClient");
-	IVEngineClient* g_EngineClient = (IVEngineClient*)EasyInterface("engine.dll", "VEngineClient");
-	IClientEntityList* g_EntityList = (IClientEntityList*)EasyInterface("client_panorama.dll", "VClientEntityList");
+	Interfaces::Initialize();
+	Offsets2::Initialize();
 
 	while (!GetAsyncKeyState(VK_INSERT)) {
 		uintptr_t EntityList = *(uintptr_t*)pEntityList;
@@ -86,7 +85,8 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		//printashex((char*)Decrypt("Aimbot Smooth").c_str());
 		//char tee[] = { 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0x1A, 0x24, 0x26, 0x26, 0x3D, 0x21 };
 		//std::cout << tee << std::endl;
-		std::cout << "teste: " << g_EngineClient->IsInGame() << std::endl;
+		std::cout << "Dormant: " << offsets::signatures::dwLocalPlayer << std::endl;
+		std::cout << "Dormant2: " << Offsets2::m_bDormant << std::endl;
 		std::cout << "FOV: " << aimbotFOV << std::endl << "Smooth: " << aimbotSmooth << std::endl;
 		std::cout << "[HOME]bRadar: " << bRadar << std::endl;
 		std::cout << "[DELETE]bESP: " << bESP << std::endl;
@@ -98,14 +98,12 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				std::cout << "ID: " << entityList->entityListObjs[i].entity->clientId() << " Health: " << entityList->entityListObjs[i].entity->health() << " Index: " << i << std::endl;
 			}
 		}
-		std::cout << std::endl;
-		std::cout << "TESTE: " << GetNetVarOffset("DT_CSPlayer", "m_iShotsFired", g_BaseClientDLL->GetAllClasses()) << std::endl;
-		if (g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer()) != NULL && g_EngineClient->IsInGame()) std::cout << "LocalPlayer: ID: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->clientId() << " Health: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->health() << std::endl;
-		for (int i = 0; i < 32; i++) {
+		/*if (g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer()) != NULL && GameState == 6) std::cout << "LocalPlayer: ID: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->clientId() << " Health: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->health() << std::endl;
+		for (int i = 1; i < 32; i++) {
 			if (g_EntityList->GetClientEntity(i) != NULL) {
 				std::cout << "ID: " << g_EntityList->GetClientEntity(i)->clientId() << " Health: " << g_EntityList->GetClientEntity(i)->health() << std::endl;
 			}
-		}
+		}*/
 		#endif // DEBUG1
 
 		//Draw GUI

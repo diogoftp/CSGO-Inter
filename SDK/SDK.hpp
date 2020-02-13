@@ -3,7 +3,8 @@
 #include <Windows.h>
 #include <Psapi.h>
 #include "offsets.hpp"
-#include "IVEngineClient.hpp"
+#include "SDK/IVEngineClient.hpp"
+#include "../netvars.hpp"
 
 class Vec3 {
 public:
@@ -48,38 +49,23 @@ public:
 	bool dormant() {
 		return *(bool*)((uintptr_t)this + offsets::signatures::m_bDormant);
 	}
-	int32_t team() {
-		return *(uint32_t*)((uintptr_t)this + offsets::netvars::m_iTeamNum);
-	}
 	int32_t health() {
-		return *(uint32_t*)((uintptr_t)this + offsets::netvars::m_iHealth);
+		return *(uint32_t*)((uintptr_t)this + Offsets2::m_iHealth);
 	}
-	Vec3 viewOffset() {
-		return *(Vec3*)((uintptr_t)this + offsets::netvars::m_vecViewOffset);
+	int32_t team() {
+		return *(uint32_t*)((uintptr_t)this + Offsets2::m_iTeamNum);
 	}
 	Vec3 origin() {
-		return *(Vec3*)((uintptr_t)this + offsets::netvars::m_vecOrigin);
-	}
-	int8_t lifeState() {
-		return *(int8_t*)((uintptr_t)this + offsets::netvars::m_lifeState);
+		return *(Vec3*)((uintptr_t)this + Offsets2::m_vecOrigin);
 	}
 
-	/*char pad_0000[100];		//0x0
-	int32_t clientId;		//0x64
-	char pad_0068[133];		//0x68
-	bool dormant;			//0xED
-	char pad_00EE[6];		//0xEE
-	int32_t team;			//0xF4
-	char pad_00F8[8];		//0xF8
-	int32_t health;			//0x100
-	char pad_0104[4];		//0x104
-	Vec3 viewOffset;		//0x108
-	char pad_0114[36];		//0x114
-	Vec3 origin;			//0x138
-	char pad_0144[283];		//0x144
-	int8_t lifeState;		//0x25F
-	char pad_0260[36];		//0x260*/
-};							//0x284
+	int8_t lifeState() {
+		return *(int8_t*)((uintptr_t)this + Offsets2::m_lifeState);
+	}
+	Vec3 viewOffset() {
+		return *(Vec3*)((uintptr_t)this + Offsets2::m_vecViewOffset);
+	}
+};
 
 class EntityListObj {
 public:

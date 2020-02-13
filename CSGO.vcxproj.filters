@@ -12,6 +12,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{cb9229e5-00c2-485b-8e8f-34f0b359f41f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{b8de5afd-b83f-4f0b-b9fb-5a22ecbb878f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -56,11 +59,14 @@
     <ClCompile Include="interfaces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vector2D.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SDK\vector2D.cpp">
+      <Filter>SDK</Filter>
     </ClCompile>
-    <ClCompile Include="VMatrix.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SDK\VMatrix.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="netvars.cpp">
+      <Filter>SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,9 +74,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="aimbot.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDK.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xor.hpp">
@@ -115,19 +118,25 @@
     <ClInclude Include="interfaces.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IVEngineClient.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SDK\SDK.hpp">
+      <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="vector2D.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SDK\vector.hpp">
+      <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="vector.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SDK\vector2D.hpp">
+      <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="QAngle.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SDK\VMatrix.hpp">
+      <Filter>SDK</Filter>
     </ClInclude>
-    <ClInclude Include="VMatrix.hpp">
+    <ClInclude Include="SDK\IVEngineClient.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\QAngle.hpp">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="netvars.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

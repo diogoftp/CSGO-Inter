@@ -1,9 +1,9 @@
 #pragma once
 
-#include "vector.hpp"
-#include "vector2D.hpp"
-#include "QAngle.hpp"
-#include "VMatrix.hpp"
+#include "SDK/vector.hpp"
+#include "SDK/vector2D.hpp"
+#include "SDK/QAngle.hpp"
+#include "SDK/VMatrix.hpp"
 
 #define SIGNONSTATE_NONE		0	// no state yet, about to connect
 #define SIGNONSTATE_CHALLENGE	1	// client challenging server, all OOB packets

@@ -1,4 +1,5 @@
 #include "ESP.hpp"
+#include "netvars.hpp"
 
 void ESP(Entity* localPlayer, Entity* target, uintptr_t dwClient, uintptr_t GlowObjectManager) {
     int my_team = 0;
@@ -6,10 +7,10 @@ void ESP(Entity* localPlayer, Entity* target, uintptr_t dwClient, uintptr_t Glow
 
     if (localPlayer != NULL && GlowObjectManager != NULL) {
         //my_team = localPlayer->team;
-        my_team = *(int*)((uintptr_t)localPlayer + offsets::netvars::m_iTeamNum);
-        int glowIndex = *(int*)((uintptr_t)target + offsets::netvars::m_iGlowIndex);
+        my_team = *(int*)((uintptr_t)localPlayer + Offsets2::m_iTeamNum);
+        int glowIndex = *(int*)((uintptr_t)target + Offsets2::m_iGlowIndex);
         //ent_team = target->team;
-        ent_team = *(int*)((uintptr_t)target + offsets::netvars::m_iTeamNum);
+        ent_team = *(int*)((uintptr_t)target + Offsets2::m_iTeamNum);
         if (ent_team == my_team) {
             *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x4)) = 0.f;
             *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x8)) = 0.f;

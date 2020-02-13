@@ -1,8 +1,11 @@
 #include "interfaces.hpp"
 
-void* CaptureInterface(const char* moduleName, const char* interfaceName) {
-	auto create_interface_fn = reinterpret_cast<void* (*)(const char* pName, int* pReturnCode)>(GetProcAddress(GetModuleHandleA(moduleName), "CreateInterface"));
-	return create_interface_fn(interfaceName, nullptr);
+namespace Interfaces {
+	void Initialize() {
+		g_BaseClientDLL = (IBaseClientDLL*)EasyInterface("client_panorama.dll", "VClient");
+		g_EngineClient = (IVEngineClient*)EasyInterface("engine.dll", "VEngineClient");
+		g_EntityList = (IClientEntityList*)EasyInterface("client_panorama.dll", "VClientEntityList");
+	}
 }
 
 typedef void* (*InstantiateInterface)();
@@ -15,6 +18,11 @@ public:
 	CInterface* NextInterface; //0x0008 
 
 };//Size=0x000C
+
+void* CaptureInterface(const char* moduleName, const char* interfaceName) {
+	auto create_interface_fn = reinterpret_cast<void* (*)(const char* pName, int* pReturnCode)>(GetProcAddress(GetModuleHandleA(moduleName), "CreateInterface"));
+	return create_interface_fn(interfaceName, nullptr);
+}
 
 void* EasyInterface(const char* _Module, const char* _Object) {
 	/*
