@@ -125,7 +125,7 @@ void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles) {
 void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth) {
 	float aimbotOver = 0.14f;
 	float aimbotSmoothRand = 2.5f;
-	float RCSSmoothRand = 0.7f;
+	float RCSSmoothRand = 0.35f;
 	float dynFOV = 0.0f;
 	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.7f;
 	Vec3 target = getBestFOV(localPlayer, viewAngles, entityList, aimbotFOV+dynFOV);
@@ -137,7 +137,7 @@ void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float
 		if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
 		myAngle.z = 0.0f;
 
-		if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+		if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 3) {
 			Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_viewPunchAngle);
 			myAngle.x -= (currentPunch.x * 2.5f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
 			myAngle.y -= (currentPunch.y * 2.0f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
