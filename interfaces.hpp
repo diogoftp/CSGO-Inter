@@ -5,8 +5,8 @@ namespace Interfaces {
 	void Initialize();
 }
 inline IBaseClientDLL* g_BaseClientDLL = nullptr;
-inline IVEngineClient* g_EngineClient = nullptr;
-inline IClientEntityList* g_EntityList = nullptr;
+//inline IVEngineClient* g_EngineClient = nullptr;
+//inline IClientEntityList* g_EntityList = nullptr;
 //inline IEngineTrace* g_EngineTrace = nullptr;
 
 void* CaptureInterface(const char* moduleName, const char* interfaceName);

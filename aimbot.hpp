@@ -1,9 +1,5 @@
 #pragma once
-#include <algorithm>
-#include <vector>
-#include <time.h>
-#include "SDK.hpp"
-#include "offsets.hpp"
+#include "SDK/SDK.hpp"
 
 const float pi = 3.14159265358979323846f;
 

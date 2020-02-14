@@ -1,5 +1,4 @@
 #pragma once
-#include "SDK.hpp"
-#include "offsets.hpp"
+#include "SDK/SDK.hpp"
 
 void Radar(Entity* target);

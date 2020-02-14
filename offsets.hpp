@@ -1,159 +1,40 @@
 #pragma once
-#include <cstdint>
+#include <vector>
+
+MODULEINFO GetModuleInfo(const char* szModule);
+const char* ScanIn(const char* pattern, const char* mask, const char* begin, unsigned int size);
+ptrdiff_t PatternScan(const char* module, const char* pattern, const char* mask, std::vector<int> offsets, unsigned int extra, bool relative);
 
 namespace offsets {
-	namespace netvars {
-		/*ptrdiff_t m_iHealth = findOffset("m_iHealth");
-		ptrdiff_t m_bSpotted = findOffset("m_bSpotted");
-		ptrdiff_t m_bSpottedByMask = findOffset("m_bSpottedByMask");
-		ptrdiff_t m_dwBoneMatrix = findOffset("m_dwBoneMatrix");
-		ptrdiff_t m_iGlowIndex = findOffset("m_iGlowIndex");
-		ptrdiff_t m_iShotsFired = findOffset("m_iShotsFired");
-		ptrdiff_t m_iTeamNum = findOffset("m_iTeamNum");
-		ptrdiff_t m_lifeState = findOffset("m_lifeState");
-		ptrdiff_t m_vecOrigin = findOffset("m_vecOrigin");
-		ptrdiff_t m_vecViewOffset = findOffset("m_vecViewOffset");*/
-		constexpr ptrdiff_t cs_gamerules_data = 0x0;
-		constexpr ptrdiff_t m_ArmorValue = 0xB368;
-		constexpr ptrdiff_t m_Collision = 0x320;
-		constexpr ptrdiff_t m_CollisionGroup = 0x474;
-		constexpr ptrdiff_t m_Local = 0x2FBC;
-		constexpr ptrdiff_t m_MoveType = 0x25C;
-		constexpr ptrdiff_t m_OriginalOwnerXuidHigh = 0x31B4;
-		constexpr ptrdiff_t m_OriginalOwnerXuidLow = 0x31B0;
-		constexpr ptrdiff_t m_SurvivalGameRuleDecisionTypes = 0x1320;
-		constexpr ptrdiff_t m_SurvivalRules = 0xCF8;
-		constexpr ptrdiff_t m_aimPunchAngle = 0x302C;
-		constexpr ptrdiff_t m_aimPunchAngleVel = 0x3038;
-		constexpr ptrdiff_t m_angEyeAnglesX = 0xB36C;
-		constexpr ptrdiff_t m_angEyeAnglesY = 0xB370;
-		constexpr ptrdiff_t m_bBombPlanted = 0x99D;
-		constexpr ptrdiff_t m_bFreezePeriod = 0x20;
-		constexpr ptrdiff_t m_bGunGameImmunity = 0x3930;
-		constexpr ptrdiff_t m_bHasDefuser = 0xB378;
-		constexpr ptrdiff_t m_bHasHelmet = 0xB35C;
-		constexpr ptrdiff_t m_bInReload = 0x3295;
-		constexpr ptrdiff_t m_bIsDefusing = 0x391C;
-		constexpr ptrdiff_t m_bIsQueuedMatchmaking = 0x74;
-		constexpr ptrdiff_t m_bIsScoped = 0x3914;
-		constexpr ptrdiff_t m_bIsValveDS = 0x75;
-		constexpr ptrdiff_t m_bSpotted = 0x93D;
-		constexpr ptrdiff_t m_bSpottedByMask = 0x980;
-		constexpr ptrdiff_t m_bStartedArming = 0x33E0;
-		constexpr ptrdiff_t m_clrRender = 0x70;
-		constexpr ptrdiff_t m_dwBoneMatrix = 0x26A8;
-		constexpr ptrdiff_t m_fAccuracyPenalty = 0x3320;
-		constexpr ptrdiff_t m_fFlags = 0x104;
-		constexpr ptrdiff_t m_flC4Blow = 0x2990;
-		constexpr ptrdiff_t m_flDefuseCountDown = 0x29AC;
-		constexpr ptrdiff_t m_flDefuseLength = 0x29A8;
-		constexpr ptrdiff_t m_flFallbackWear = 0x31C0;
-		constexpr ptrdiff_t m_flFlashDuration = 0xA410;
-		constexpr ptrdiff_t m_flFlashMaxAlpha = 0xA40C;
-		constexpr ptrdiff_t m_flLastBoneSetupTime = 0x2924;
-		constexpr ptrdiff_t m_flLowerBodyYawTarget = 0x3A7C;
-		constexpr ptrdiff_t m_flNextAttack = 0x2D70;
-		constexpr ptrdiff_t m_flNextPrimaryAttack = 0x3228;
-		constexpr ptrdiff_t m_flSimulationTime = 0x268;
-		constexpr ptrdiff_t m_flTimerLength = 0x2994;
-		constexpr ptrdiff_t m_hActiveWeapon = 0x2EF8;
-		constexpr ptrdiff_t m_hMyWeapons = 0x2DF8;
-		constexpr ptrdiff_t m_hObserverTarget = 0x3388;
-		constexpr ptrdiff_t m_hOwner = 0x29CC;
-		constexpr ptrdiff_t m_hOwnerEntity = 0x14C;
-		constexpr ptrdiff_t m_iAccountID = 0x2FC8;
-		constexpr ptrdiff_t m_iClip1 = 0x3254;
-		constexpr ptrdiff_t m_iCompetitiveRanking = 0x1A84;
-		constexpr ptrdiff_t m_iCompetitiveWins = 0x1B88;
-		constexpr ptrdiff_t m_iCrosshairId = 0xB3D4;
-		constexpr ptrdiff_t m_iEntityQuality = 0x2FAC;
-		constexpr ptrdiff_t m_iFOV = 0x31E4;
-		constexpr ptrdiff_t m_iFOVStart = 0x31E8;
-		constexpr ptrdiff_t m_iGlowIndex = 0xA428;
-		constexpr ptrdiff_t m_iHealth = 0x100;
-		constexpr ptrdiff_t m_iItemDefinitionIndex = 0x2FAA;
-		constexpr ptrdiff_t m_iItemIDHigh = 0x2FC0;
-		constexpr ptrdiff_t m_iMostRecentModelBoneCounter = 0x2690;
-		constexpr ptrdiff_t m_iObserverMode = 0x3374;
-		constexpr ptrdiff_t m_iShotsFired = 0xA380;
-		constexpr ptrdiff_t m_iState = 0x3248;
-		constexpr ptrdiff_t m_iTeamNum = 0xF4;
-		constexpr ptrdiff_t m_lifeState = 0x25F;
-		constexpr ptrdiff_t m_nFallbackPaintKit = 0x31B8;
-		constexpr ptrdiff_t m_nFallbackSeed = 0x31BC;
-		constexpr ptrdiff_t m_nFallbackStatTrak = 0x31C4;
-		constexpr ptrdiff_t m_nForceBone = 0x268C;
-		constexpr ptrdiff_t m_nTickBase = 0x342C;
-		constexpr ptrdiff_t m_rgflCoordinateFrame = 0x444;
-		constexpr ptrdiff_t m_szCustomName = 0x303C;
-		constexpr ptrdiff_t m_szLastPlaceName = 0x35B0;
-		constexpr ptrdiff_t m_thirdPersonViewAngles = 0x31D8;
-		constexpr ptrdiff_t m_vecOrigin = 0x138;
-		constexpr ptrdiff_t m_vecVelocity = 0x114;
-		constexpr ptrdiff_t m_vecViewOffset = 0x108;
-		constexpr ptrdiff_t m_viewPunchAngle = 0x3020;
-	} // namespace netvars
-	namespace signatures {
-		/*ptrdiff_t dwClientState = findOffset("dwClientState");
-		ptrdiff_t dwClientState_State = findOffset("dwClientState_State");
-		ptrdiff_t dwClientState_ViewAngles = findOffset("dwClientState_ViewAngles");
-		ptrdiff_t dwLocalPlayer = findOffset("dwLocalPlayer");
-		ptrdiff_t dwEntityList = findOffset("dwEntityList");
-		ptrdiff_t dwGlowObjectManager = findOffset("dwGlowObjectManager");
-		ptrdiff_t m_bDormant = findOffset("m_bDormant");*/
-		constexpr ptrdiff_t clientstate_choked_commands = 0x4D28;
-		constexpr ptrdiff_t clientstate_delta_ticks = 0x174;
-		constexpr ptrdiff_t clientstate_last_outgoing_command = 0x4D24;
-		constexpr ptrdiff_t clientstate_net_channel = 0x9C;
-		constexpr ptrdiff_t convar_name_hash_table = 0x2F0F8;
-		constexpr ptrdiff_t dwClientState = 0x588D9C;
-		constexpr ptrdiff_t dwClientState_GetLocalPlayer = 0x180;
-		constexpr ptrdiff_t dwClientState_IsHLTV = 0x4D40;
-		constexpr ptrdiff_t dwClientState_Map = 0x28C;
-		constexpr ptrdiff_t dwClientState_MapDirectory = 0x188;
-		constexpr ptrdiff_t dwClientState_MaxPlayer = 0x388;
-		constexpr ptrdiff_t dwClientState_PlayerInfo = 0x52B8;
-		constexpr ptrdiff_t dwClientState_State = 0x108;
-		constexpr ptrdiff_t dwClientState_ViewAngles = 0x4D88;
-		constexpr ptrdiff_t dwEntityList = 0x4D3C7BC;
-		constexpr ptrdiff_t dwForceAttack = 0x316DD80;
-		constexpr ptrdiff_t dwForceAttack2 = 0x316DD8C;
-		constexpr ptrdiff_t dwForceBackward = 0x316DDD4;
-		constexpr ptrdiff_t dwForceForward = 0x316DDB0;
-		constexpr ptrdiff_t dwForceJump = 0x51E0004;
-		constexpr ptrdiff_t dwForceLeft = 0x316DDC8;
-		constexpr ptrdiff_t dwForceRight = 0x316DDEC;
-		constexpr ptrdiff_t dwGameDir = 0x6274F8;
-		constexpr ptrdiff_t dwGameRulesProxy = 0x52532EC;
-		constexpr ptrdiff_t dwGetAllClasses = 0xD4ED9C;
-		constexpr ptrdiff_t dwGlobalVars = 0x588AA0;
-		constexpr ptrdiff_t dwGlowObjectManager = 0x527DFA0;
-		constexpr ptrdiff_t dwInput = 0x5187980;
-		constexpr ptrdiff_t dwInterfaceLinkList = 0x8F4084;
-		constexpr ptrdiff_t dwLocalPlayer = 0xD28B74;
-		constexpr ptrdiff_t dwMouseEnable = 0xD2E718;
-		constexpr ptrdiff_t dwMouseEnablePtr = 0xD2E6E8;
-		constexpr ptrdiff_t dwPlayerResource = 0x316C10C;
-		constexpr ptrdiff_t dwRadarBase = 0x517152C;
-		constexpr ptrdiff_t dwSensitivity = 0xD2E5B4;
-		constexpr ptrdiff_t dwSensitivityPtr = 0xD2E588;
-		constexpr ptrdiff_t dwSetClanTag = 0x89D60;
-		constexpr ptrdiff_t dwViewMatrix = 0x4D2E0E4;
-		constexpr ptrdiff_t dwWeaponTable = 0x5188440;
-		constexpr ptrdiff_t dwWeaponTableIndex = 0x324C;
-		constexpr ptrdiff_t dwYawPtr = 0xD2E378;
-		constexpr ptrdiff_t dwZoomSensitivityRatioPtr = 0xD33598;
-		constexpr ptrdiff_t dwbSendPackets = 0xD386A;
-		constexpr ptrdiff_t dwppDirect3DDevice9 = 0xA6030;
-		constexpr ptrdiff_t force_update_spectator_glow = 0x398642;
-		constexpr ptrdiff_t interface_engine_cvar = 0x3E9EC;
-		constexpr ptrdiff_t is_c4_owner = 0x3A4A70;
-		constexpr ptrdiff_t m_bDormant = 0xED;
-		constexpr ptrdiff_t m_pStudioHdr = 0x294C;
-		constexpr ptrdiff_t m_pitchClassPtr = 0x51717D0;
-		constexpr ptrdiff_t m_yawClassPtr = 0xD2E378;
-		constexpr ptrdiff_t model_ambient_min = 0x58BDBC;
-		constexpr ptrdiff_t set_abs_angles = 0x1CED30;
-		constexpr ptrdiff_t set_abs_origin = 0x1CEB70;
-	} // namespace signatures
-} // namespace offsets
+	void Initialize();
+	//NetVars
+	//DT_BasePlayer
+	inline ptrdiff_t m_iHealth = NULL;
+	inline ptrdiff_t m_iTeamNum = NULL;
+	inline ptrdiff_t m_vecOrigin = NULL;
+
+	//DT_CSPlayer
+	inline ptrdiff_t m_lifeState = NULL;
+	inline ptrdiff_t m_vecViewOffset = NULL;
+	inline ptrdiff_t m_iGlowIndex = NULL;
+	inline ptrdiff_t m_iShotsFired = NULL;
+
+	//DT_BaseEntity
+	inline ptrdiff_t m_bSpotted = NULL;
+	inline ptrdiff_t m_bSpottedByMask = NULL;
+
+	//DT_BaseAnimating
+	inline ptrdiff_t m_dwBoneMatrix = NULL;
+
+	//Signatures
+	//client_panorama.dll
+	inline ptrdiff_t m_bDormant = NULL;
+	inline ptrdiff_t dwLocalPlayer = NULL;
+	inline ptrdiff_t dwGlowObjectManager = NULL;
+	inline ptrdiff_t dwEntityList = NULL;
+
+	//engine.dll
+	inline ptrdiff_t dwClientState = NULL;
+	inline ptrdiff_t dwClientState_State = NULL;
+	inline ptrdiff_t dwClientState_ViewAngles = NULL;
+}

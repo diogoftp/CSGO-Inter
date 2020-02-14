@@ -1,4 +1,5 @@
 #include "aimbot.hpp"
+#include "offsets.hpp"
 
 Vec3 oldAngle;
 
@@ -27,7 +28,7 @@ Vec3 getBestFOV(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, floa
 	for (unsigned short int i = 0; i < 32; i++) {
 		if (entityList->entityListObjs[i].entity && isSpotted(localPlayer, entityList->entityListObjs[i].entity) && entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->lifeState() == 0 && entityList->entityListObjs[i].entity->health() > 0 && entityList->entityListObjs[i].entity->team() != localPlayer->team() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
 			uintptr_t BaseAddress = (uintptr_t)(entityList->entityListObjs[i].entity);
-			uintptr_t BoneBase = *(uintptr_t*)(BaseAddress + offsets::netvars::m_dwBoneMatrix);
+			uintptr_t BoneBase = *(uintptr_t*)(BaseAddress + offsets::m_dwBoneMatrix);
 			Vec3 bones;
 			bones.x = *(float*)(BoneBase + 0x30 * 7 + 0x0C);
 			bones.y = *(float*)(BoneBase + 0x30 * 7 + 0x1C);
@@ -109,12 +110,12 @@ float RandomFloat(float min, float max) {
 
 int isSpotted(Entity* localPlayer, Entity* target) {
 	int mask;
-	mask = *(int*)((uintptr_t)target + offsets::netvars::m_bSpottedByMask);
+	mask = *(int*)((uintptr_t)target + offsets::m_bSpottedByMask);
 	return (bool)(mask & (1 << (localPlayer->clientId() - 1)));
 }
 
 void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles) {
-	if (*(int*)((uintptr_t)localPlayer + offsets::netvars::m_iShotsFired) > 1) {
+	if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
 		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + 0x302C);
 		Vec3 mviewAngles;
 		mviewAngles.x = viewAngles->x;

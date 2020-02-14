@@ -1,10 +1,15 @@
 #include "interfaces.hpp"
+#include "xor.hpp"
+
+#define client_panoramadllSTR Decrypt({ 0x2a, 0x25, 0x20, 0x2c, 0x27, 0x3d, 0x16, 0x39, 0x28, 0x27, 0x26, 0x3b, 0x28, 0x24, 0x28, 0x67, 0x2d, 0x25, 0x25 }).c_str()
+#define VClientSTR Decrypt({ 0x1f, 0xa, 0x25, 0x20, 0x2c, 0x27, 0x3d }).c_str()
+#define CreateInterfaceSTR Decrypt({ 0xa, 0x3b, 0x2c, 0x28, 0x3d, 0x2c, 0x0, 0x27, 0x3d, 0x2c, 0x3b, 0x2f, 0x28, 0x2a, 0x2c }).c_str()
 
 namespace Interfaces {
 	void Initialize() {
-		g_BaseClientDLL = (IBaseClientDLL*)EasyInterface("client_panorama.dll", "VClient");
-		g_EngineClient = (IVEngineClient*)EasyInterface("engine.dll", "VEngineClient");
-		g_EntityList = (IClientEntityList*)EasyInterface("client_panorama.dll", "VClientEntityList");
+		g_BaseClientDLL = (IBaseClientDLL*)EasyInterface(client_panoramadllSTR, VClientSTR);
+		//g_EngineClient = (IVEngineClient*)EasyInterface("engine.dll", "VEngineClient");
+		//g_EntityList = (IClientEntityList*)EasyInterface("client_panorama.dll", "VClientEntityList");
 	}
 }
 
@@ -20,7 +25,7 @@ public:
 };//Size=0x000C
 
 void* CaptureInterface(const char* moduleName, const char* interfaceName) {
-	auto create_interface_fn = reinterpret_cast<void* (*)(const char* pName, int* pReturnCode)>(GetProcAddress(GetModuleHandleA(moduleName), "CreateInterface"));
+	auto create_interface_fn = reinterpret_cast<void* (*)(const char* pName, int* pReturnCode)>(GetProcAddress(GetModuleHandleA(moduleName), CreateInterfaceSTR));
 	return create_interface_fn(interfaceName, nullptr);
 }
 
@@ -37,7 +42,7 @@ void* EasyInterface(const char* _Module, const char* _Object) {
 	1E6ECD24 | E9 A7 FC FF FF           | jmp client.1E6EC9D0                     |
 	*/
 
-	ULONG CreateInterface = (ULONG)GetProcAddress(GetModuleHandle(_Module), "CreateInterface");
+	ULONG CreateInterface = (ULONG)GetProcAddress(GetModuleHandle(_Module), CreateInterfaceSTR);
 	ULONG ShortJump = (ULONG)CreateInterface + 5; //magic number shit explained above
 	ULONG Jump = (((ULONG)CreateInterface + 5) + *(ULONG*)ShortJump) + 4;
 	CInterface* List = **(CInterface***)(Jump + 6);

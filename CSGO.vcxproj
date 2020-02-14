@@ -187,7 +187,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="interfaces.cpp" />
     <ClCompile Include="memHelper.cpp" />
-    <ClCompile Include="netvars.cpp" />
+    <ClCompile Include="offsets.cpp" />
     <ClCompile Include="radar.cpp" />
     <ClCompile Include="SDK\vector2D.cpp" />
     <ClCompile Include="SDK\VMatrix.cpp" />
@@ -207,7 +207,6 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="interfaces.hpp" />
     <ClInclude Include="memHelper.hpp" />
-    <ClInclude Include="netvars.hpp" />
     <ClInclude Include="offsets.hpp" />
     <ClInclude Include="radar.hpp" />
     <ClInclude Include="SDK\IVEngineClient.hpp" />

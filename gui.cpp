@@ -114,12 +114,12 @@ void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, 
 
 		ImGui::Begin("Window");
 
-		ImGui::Checkbox((char*)Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP);
-		ImGui::Checkbox((char*)Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar);
-		ImGui::SliderFloat((char*)Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0xF, 0x6, 0x1F }).c_str(), aimbotFOV, 1.0f, 360.0f, "%.1f");
+		ImGui::Checkbox(Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP); //ESP
+		ImGui::Checkbox(Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar); //Radar
+		ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0xF, 0x6, 0x1F }).c_str(), aimbotFOV, 1.0f, 360.0f, "%.1f"); //AimbotFOV
 		if (*aimbotFOV > 360.0f) *aimbotFOV = 360.0f;
 		else if (*aimbotFOV < 1.0f) *aimbotFOV = 1.0f;
-		ImGui::SliderFloat((char*)Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0x1A, 0x24, 0x26, 0x26, 0x3D, 0x21 }).c_str(), aimbotSmooth, 1.0f, 20.0f, "%.1f");
+		ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0x1A, 0x24, 0x26, 0x26, 0x3D, 0x21 }).c_str(), aimbotSmooth, 1.0f, 20.0f, "%.1f"); //AimbotSmooth
 		if (*aimbotSmooth > 20.0f) *aimbotSmooth = 20.0f;
 		else if (*aimbotSmooth < 1.0f) *aimbotSmooth = 1.0f;
 

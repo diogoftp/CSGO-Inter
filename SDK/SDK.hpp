@@ -1,10 +1,8 @@
 #pragma once
-#include <cstdint>
 #include <Windows.h>
 #include <Psapi.h>
-#include "offsets.hpp"
 #include "SDK/IVEngineClient.hpp"
-#include "../netvars.hpp"
+#include "../offsets.hpp"
 
 class Vec3 {
 public:
@@ -47,23 +45,23 @@ public:
 		return *(int32_t*)((uintptr_t)this + 0x64);
 	}
 	bool dormant() {
-		return *(bool*)((uintptr_t)this + offsets::signatures::m_bDormant);
+		return *(bool*)((uintptr_t)this + offsets::m_bDormant);
 	}
 	int32_t health() {
-		return *(uint32_t*)((uintptr_t)this + Offsets2::m_iHealth);
+		return *(uint32_t*)((uintptr_t)this + offsets::m_iHealth);
 	}
 	int32_t team() {
-		return *(uint32_t*)((uintptr_t)this + Offsets2::m_iTeamNum);
+		return *(uint32_t*)((uintptr_t)this + offsets::m_iTeamNum);
 	}
 	Vec3 origin() {
-		return *(Vec3*)((uintptr_t)this + Offsets2::m_vecOrigin);
+		return *(Vec3*)((uintptr_t)this + offsets::m_vecOrigin);
 	}
 
 	int8_t lifeState() {
-		return *(int8_t*)((uintptr_t)this + Offsets2::m_lifeState);
+		return *(int8_t*)((uintptr_t)this + offsets::m_lifeState);
 	}
 	Vec3 viewOffset() {
-		return *(Vec3*)((uintptr_t)this + Offsets2::m_vecViewOffset);
+		return *(Vec3*)((uintptr_t)this + offsets::m_vecViewOffset);
 	}
 };
 

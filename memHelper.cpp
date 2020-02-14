@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include "memHelper.hpp"
 
 uintptr_t mem::FindDMAAddy(std::vector<unsigned int> Offsets, DWORD BaseAddress) {
