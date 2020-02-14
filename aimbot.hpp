@@ -13,3 +13,4 @@ void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, flo
 int isSpotted(Entity* localPlayer, Entity* target);
 float RandomFloat(float min, float max);
 void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles);
+void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth);

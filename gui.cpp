@@ -93,7 +93,7 @@ int guiSetup(HWND hwnd, WNDCLASSEX wc) {
 	return 0;
 }
 
-void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth) {
+void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot) {
 	// Poll and handle messages (inputs, window resize, etc.)
 // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -116,12 +116,13 @@ void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, 
 
 		ImGui::Checkbox(Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP); //ESP
 		ImGui::Checkbox(Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar); //Radar
+		ImGui::Checkbox(Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x1b, 0xa, 0x1a }).c_str(), bRCSAimbot); //RCSAimbot
 		ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0xF, 0x6, 0x1F }).c_str(), aimbotFOV, 1.0f, 360.0f, "%.1f"); //AimbotFOV
 		if (*aimbotFOV > 360.0f) *aimbotFOV = 360.0f;
 		else if (*aimbotFOV < 1.0f) *aimbotFOV = 1.0f;
-		ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0x1A, 0x24, 0x26, 0x26, 0x3D, 0x21 }).c_str(), aimbotSmooth, 1.0f, 20.0f, "%.1f"); //AimbotSmooth
+		ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0x1A, 0x24, 0x26, 0x26, 0x3D, 0x21 }).c_str(), aimbotSmooth, 0.0f, 20.0f, "%.1f"); //AimbotSmooth
 		if (*aimbotSmooth > 20.0f) *aimbotSmooth = 20.0f;
-		else if (*aimbotSmooth < 1.0f) *aimbotSmooth = 1.0f;
+		else if (*aimbotSmooth < 0.0f || (*aimbotSmooth > 0.0f && *aimbotSmooth < 1.0f)) *aimbotSmooth = 1.0f;
 
 		ImGui::End();
 	}

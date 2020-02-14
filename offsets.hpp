@@ -12,6 +12,8 @@ namespace offsets {
 	inline ptrdiff_t m_iHealth = NULL;
 	inline ptrdiff_t m_iTeamNum = NULL;
 	inline ptrdiff_t m_vecOrigin = NULL;
+	inline ptrdiff_t m_aimPunchAngle = NULL;
+	inline ptrdiff_t m_viewPunchAngle = NULL;
 
 	//DT_CSPlayer
 	inline ptrdiff_t m_lifeState = NULL;

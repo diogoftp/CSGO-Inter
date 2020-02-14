@@ -101,6 +101,68 @@ void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, flo
 	Sleep(50);
 }
 
+void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles) {
+	if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
+		Vec3 myAngle = *viewAngles;
+		myAngle.x += oldAngle.x;
+		myAngle.y += oldAngle.y;
+
+		normalize(myAngle);
+		clamp(myAngle);
+
+		viewAngles->x = myAngle.x - currentPunch.x * 2;
+		viewAngles->y = myAngle.y - currentPunch.y * 2;
+		oldAngle.x = currentPunch.x * 2;
+		oldAngle.y = currentPunch.y * 2;
+	}
+	else {
+		oldAngle.x = 0.0f;
+		oldAngle.y = 0.0f;
+	}
+}
+
+void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth) {
+	float aimbotOver = 0.14f;
+	float aimbotSmoothRand = 2.5f;
+	float RCSSmoothRand = 0.7f;
+	float dynFOV = 0.0f;
+	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.7f;
+	Vec3 target = getBestFOV(localPlayer, viewAngles, entityList, aimbotFOV+dynFOV);
+	Vec3 myAngle = *viewAngles;
+	if (target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth > 0) {
+		myAngle.x += (target.x / (aimbotSmooth + RandomFloat(0, aimbotSmoothRand))) + RandomFloat(-1 * aimbotOver, aimbotOver);
+		myAngle.y += (target.y / (aimbotSmooth + RandomFloat(0, aimbotSmoothRand))) + RandomFloat(-1 * aimbotOver, aimbotOver);
+		if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
+		if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
+		myAngle.z = 0.0f;
+
+		if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+			Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_viewPunchAngle);
+			myAngle.x -= (currentPunch.x * 2.5f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
+			myAngle.y -= (currentPunch.y * 2.0f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
+		}
+
+		normalize(myAngle);
+		clamp(myAngle);
+
+		viewAngles->x = myAngle.x;
+		viewAngles->y = myAngle.y;
+		viewAngles->z = myAngle.z;
+	}
+	else if (target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth == 0) {
+		myAngle.x += target.x;
+		myAngle.y += target.y;
+		myAngle.z = 0.0f;
+		normalize(myAngle);
+		clamp(myAngle);
+		viewAngles->x = myAngle.x;
+		viewAngles->y = myAngle.y;
+		viewAngles->z = myAngle.z;
+	}
+	Sleep(50);
+}
+
 float RandomFloat(float min, float max) {
 	float random = ((float)rand()) / (float)RAND_MAX;
 	float diff = max - min;
@@ -114,35 +176,11 @@ int isSpotted(Entity* localPlayer, Entity* target) {
 	return (bool)(mask & (1 << (localPlayer->clientId() - 1)));
 }
 
-void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles) {
-	if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
-		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + 0x302C);
-		Vec3 mviewAngles;
-		mviewAngles.x = viewAngles->x;
-		mviewAngles.y = viewAngles->y;
-		mviewAngles.x += oldAngle.x;
-		mviewAngles.y += oldAngle.y;
-
-		normalize(mviewAngles);
-		clamp(mviewAngles);
-
-		viewAngles->x = mviewAngles.x - currentPunch.x * 2;
-		viewAngles->y = mviewAngles.y - currentPunch.y * 2;
-		oldAngle.x = currentPunch.x * 2;
-		oldAngle.y = currentPunch.y * 2;
-	}
-	else {
-		oldAngle.x = 0.0f;
-		oldAngle.y = 0.0f;
-	}
-}
-
 bool IsVisible(Entity* pLocal, Entity* pEnt) {
 /*		Ray_t ray;
 		trace_t tr;
 		Vector localEye, entEye;
-		if (GetBonePosition(pLocal, localEye, 10) && GetBonePosition(pEnt, entEye, 10))
-		{
+		if (GetBonePosition(pLocal, localEye, 10) && GetBonePosition(pEnt, entEye, 10)) {
 			ray.Init(localEye, entEye);
 			CTraceFilter traceFilter;
 			traceFilter.pSkip = pLocal;

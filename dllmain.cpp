@@ -35,7 +35,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 	float aimbotFOV = 3.0f;
 	float aimbotSmooth = 4.0f;
-	bool bRadar = false, bESP = false, bMenu = true;
+	bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true;
 	//End GUI Setup
 
 	USES_CONVERSION;
@@ -105,7 +105,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		//Draw GUI
 		if (bMenu) {
 			ShowWindow(hwnd, SW_SHOW);
-			windowLoop(hwnd, msg, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth);
+			windowLoop(hwnd, msg, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
 			UpdateWindow(hwnd);
 		}
 		else {
@@ -119,7 +119,12 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6) {
 		//if (GetAsyncKeyState(VK_SHIFT) && GameState == 6) {
-			aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth);
+			if (bRCSAimbot) {
+				aimbotRCS(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth);
+			}
+			else {
+				aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth);
+			}
 		}
 
 		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6) {
