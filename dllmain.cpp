@@ -32,16 +32,22 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	ZeroMemory(&msg, sizeof(msg));
 	int teste = guiSetup(hwnd, wc);
 	if (teste != 0) return 1;
+	//End GUI Setup
 
+	//Vars
 	float aimbotFOV = 3.0f;
 	float aimbotSmooth = 4.0f;
 	bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true;
-	//End GUI Setup
+
+	//Flags
+	bool aimKeyState = false;
+	bool aimKeyPrevState = false;
+	bool targetLock = false;
+	bool clearTarget = true;
 
 	USES_CONVERSION;
 	//uintptr_t dwClient = (uintptr_t)GetModuleHandleW(L"client_panorama.dll");
 	//uintptr_t dwEngine = (uintptr_t)GetModuleHandleW(L"engine.dll");
-	
 	uintptr_t dwClient = (uintptr_t)GetModuleHandleW(CA2W(Decrypt("*% ,'=9('&;($(g-%%").c_str())); //client_panorama.dll
 	uintptr_t dwEngine = (uintptr_t)GetModuleHandleW(CA2W(Decrypt(",'. ',g-%%").c_str())); //engine.dll
 
@@ -52,9 +58,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	uintptr_t pGlowObjectManager = dwClient + offsets::dwGlowObjectManager;
 	uintptr_t pEntityList = dwClient + offsets::dwEntityList;
 	uintptr_t pClientState = dwEngine + offsets::dwClientState;
-	uintptr_t pGameState = pClientState + offsets::dwClientState_State;
-
-	uintptr_t m_LoopDist = 0x10;
 
 	srand((unsigned int)time(0));
 
@@ -65,14 +68,11 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	freopen_s(&f, "CONOUT$", "w", stdout);
 	#endif // DEBUG1
 
-
 	EntList* entityList = (EntList*)pEntityList;
-
 	while (!GetAsyncKeyState(VK_INSERT)) {
-		uintptr_t EntityList = *(uintptr_t*)pEntityList;
-		uintptr_t LocalPlayer = *(uintptr_t*)pLocalPlayer;
 		uintptr_t GlowObjectManager = *(uintptr_t*)pGlowObjectManager;
 		uintptr_t ClientState = *(uintptr_t*)pClientState;
+
 		int GameState = *(uintptr_t*)(ClientState + offsets::dwClientState_State);
 
 		Vec3* viewAngles = (Vec3*)(ClientState + offsets::dwClientState_ViewAngles);
@@ -104,33 +104,45 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		//Draw GUI
 		if (bMenu) {
+			UpdateWindow(hwnd);
 			ShowWindow(hwnd, SW_SHOW);
 			windowLoop(hwnd, msg, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
-			UpdateWindow(hwnd);
 		}
 		else {
 			ShowWindow(hwnd, SW_HIDE);
 		}
 		//End Draw GUI
 
+		//Menu toggle
 		if (GetAsyncKeyState(VK_DELETE) & 1) {
 			bMenu = !bMenu;
 		}
 
-		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6) {
-		//if (GetAsyncKeyState(VK_SHIFT) && GameState == 6) {
-			if (bRCSAimbot) {
-				aimbotRCS(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth);
+		//Check if needs to change target
+		aimKeyState = (GetKeyState(VK_XBUTTON1) & 0x100) != 0;
+		if (aimKeyPrevState != aimKeyState) {
+			if (aimKeyState) {
+				targetLock = true;
 			}
 			else {
-				aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth);
+				targetLock = false;
+				clearTarget = true;
 			}
+			aimKeyPrevState = aimKeyState;
 		}
 
+		//Aimbot
+		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6) {
+			aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth, clearTarget, bRCSAimbot);
+			if (clearTarget == true) clearTarget = false;
+		}
+
+		//Standalone RCS
 		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6) {
 			RCS(localPlayer, entityList, viewAngles);
 		}
 
+		//Radar and ESP
 		if ((bRadar || bESP) && GameState == 6) {
 			for (unsigned short int i = 0; i < 32; i++) {
 				if (entityList->entityListObjs[i].entity != NULL) {
@@ -153,7 +165,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 	FreeLibraryAndExitThread(hModule, 0);
 	return 0;
-
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, uintptr_t ul_reason_for_call, LPVOID lpReserved) {
