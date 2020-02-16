@@ -6,6 +6,8 @@
 
 #define client_panoramadllSTR Decrypt({ 0x2a, 0x25, 0x20, 0x2c, 0x27, 0x3d, 0x16, 0x39, 0x28, 0x27, 0x26, 0x3b, 0x28, 0x24, 0x28, 0x67, 0x2d, 0x25, 0x25 }).c_str()
 #define enginedllSTR Decrypt({ 0x2c, 0x27, 0x2e, 0x20, 0x27, 0x2c, 0x67, 0x2d, 0x25, 0x25 }).c_str()
+#define client_panoramadllSTR2 Decrypt({ 0x2a, 0x25, 0x20, 0x2c, 0x27, 0x3d, 0x16, 0x39, 0x28, 0x27, 0x26, 0x3b, 0x28, 0x24, 0x28, 0x67, 0x2d, 0x25, 0x25 })
+#define enginedllSTR2 Decrypt({ 0x2c, 0x27, 0x2e, 0x20, 0x27, 0x2c, 0x67, 0x2d, 0x25, 0x25 })
 #define DT_BasePlayerSTR Decrypt({ 0xd, 0x1d, 0x16, 0xb, 0x28, 0x3a, 0x2c, 0x19, 0x25, 0x28, 0x30, 0x2c, 0x3b }).c_str()
 #define DT_CSPlayerSTR Decrypt({ 0xd, 0x1d, 0x16, 0xa, 0x1a, 0x19, 0x25, 0x28, 0x30, 0x2c, 0x3b }).c_str()
 #define DT_BaseEntitySTR Decrypt({ 0xd, 0x1d, 0x16, 0xb, 0x28, 0x3a, 0x2c, 0xc, 0x27, 0x3d, 0x20, 0x3d, 0x30 }).c_str()
@@ -73,26 +75,8 @@ ptrdiff_t PatternScan(const char* module, const char* pattern, const char* mask,
 
 namespace offsets {
 	void Initialize() {
-		//Netvars
-		//DT_BasePlayer
-		m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, g_BaseClientDLL->GetAllClasses());
-		m_iTeamNum = GetNetVarOffset(DT_BasePlayerSTR, m_iTeamNumSTR, g_BaseClientDLL->GetAllClasses());
-		m_vecOrigin = GetNetVarOffset(DT_BasePlayerSTR, m_vecOriginSTR, g_BaseClientDLL->GetAllClasses());
-		m_aimPunchAngle = GetNetVarOffset(DT_BasePlayerSTR, m_aimPunchAngleSTR, g_BaseClientDLL->GetAllClasses());
-		m_viewPunchAngle = GetNetVarOffset(DT_BasePlayerSTR, m_viewPunchAngleSTR, g_BaseClientDLL->GetAllClasses());
-
-		//DT_CSPlayer
-		m_lifeState = GetNetVarOffset(DT_CSPlayerSTR, m_lifeStateSTR, g_BaseClientDLL->GetAllClasses());
-		m_vecViewOffset = GetNetVarOffset(DT_CSPlayerSTR, m_vecViewOffsetSTR, g_BaseClientDLL->GetAllClasses());
-		m_iGlowIndex = GetNetVarOffset(DT_CSPlayerSTR, m_flFlashDurationSTR, g_BaseClientDLL->GetAllClasses()) + 24;
-		m_iShotsFired = GetNetVarOffset(DT_CSPlayerSTR, m_iShotsFiredSTR, g_BaseClientDLL->GetAllClasses());
-
-		//DT_BaseEntity
-		m_bSpotted = GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedSTR, g_BaseClientDLL->GetAllClasses());
-		m_bSpottedByMask = GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedByMaskSTR, g_BaseClientDLL->GetAllClasses());
-
-		//DT_BaseAnimating
-		m_dwBoneMatrix = GetNetVarOffset(DT_BaseAnimatingSTR, m_nForceBoneSTR, g_BaseClientDLL->GetAllClasses()) + 28;
+		dwClient = (uintptr_t)GetModuleHandleA(client_panoramadllSTR);
+		dwEngine = (uintptr_t)GetModuleHandleA(enginedllSTR);
 
 		//Signatures
 		//client_panorama.dll
@@ -100,10 +84,37 @@ namespace offsets {
 		dwLocalPlayer = PatternScan(client_panoramadllSTR, "\x8D\x34\x85\x00\x00\x00\x00\x89\x15\x00\x00\x00\x00\x8B\x41\x08\x8B\x48\x04\x83\xF9\xFF", "xxx????xx????xxxxxxxxx", { 3 }, 4, true);
 		dwGlowObjectManager = PatternScan(client_panoramadllSTR, "\xA1\x00\x00\x00\x00\xA8\x01\x75\x4B", "x????xxxx", { 1 }, 4, true);
 		dwEntityList = PatternScan(client_panoramadllSTR, "\xBB\x00\x00\x00\x00\x83\xFF\x01\x0F\x8C\x00\x00\x00\x00\x3B\xF8", "x????xxxxx????xx", { 1 }, 0, true);
+		dwGetAllClasses = PatternScan(client_panoramadllSTR, "\xA1\x00\x00\x00\x00\xC3\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xA1\x00\x00\x00\x00\xB9", "x????xxxxxxxxxxxx????x", { 1, 0 }, 0, true);
 
 		//engine.dll
 		dwClientState = PatternScan(enginedllSTR, "\xA1\x00\x00\x00\x00\x33\xD2\x6A\x00\x6A\x00\x33\xC9\x89\xB0", "x????xxxxxxxxxx", { 1 }, 0, true);
 		dwClientState_State = PatternScan(enginedllSTR, "\x83\xB8\x00\x00\x00\x00\x00\x0F\x94\xC0\xC3", "xx?????xxxx", { 2 }, 0, false);
 		dwClientState_ViewAngles = PatternScan(enginedllSTR, "\xF3\x0F\x11\x80\x00\x00\x00\x00\xD9\x46\x04\xD9\x05", "xxxx????xxxxx", { 4 }, 0, false);
+
+		//Netvars
+		//DT_BasePlayer
+		//m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, aaag_BaseClientDLL->GetAllClasses());
+		//m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, bbb((ClientClass*)(dwClient + offsets::dwGetAllClasses)));
+		
+		m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_iTeamNum = GetNetVarOffset(DT_BasePlayerSTR, m_iTeamNumSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_vecOrigin = GetNetVarOffset(DT_BasePlayerSTR, m_vecOriginSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_aimPunchAngle = GetNetVarOffset(DT_BasePlayerSTR, m_aimPunchAngleSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_viewPunchAngle = GetNetVarOffset(DT_BasePlayerSTR, m_viewPunchAngleSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+
+		//DT_CSPlayer
+		m_lifeState = GetNetVarOffset(DT_CSPlayerSTR, m_lifeStateSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_vecViewOffset = GetNetVarOffset(DT_CSPlayerSTR, m_vecViewOffsetSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_iGlowIndex = GetNetVarOffset(DT_CSPlayerSTR, m_flFlashDurationSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses)) + 24;
+		m_iShotsFired = GetNetVarOffset(DT_CSPlayerSTR, m_iShotsFiredSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+
+		//DT_BaseEntity
+		m_bSpotted = GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_bSpottedByMask = GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedByMaskSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+
+		//DT_BaseAnimating
+		m_dwBoneMatrix = GetNetVarOffset(DT_BaseAnimatingSTR, m_nForceBoneSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses)) + 28;
+
+		
 	}
 }

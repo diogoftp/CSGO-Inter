@@ -7,7 +7,7 @@
 
 namespace Interfaces {
 	void Initialize() {
-		g_BaseClientDLL = (IBaseClientDLL*)EasyInterface(client_panoramadllSTR, VClientSTR);
+		//g_BaseClientDLL = (IBaseClientDLL*)EasyInterface(client_panoramadllSTR, VClientSTR);
 		//g_EngineClient = (IVEngineClient*)EasyInterface("engine.dll", "VEngineClient");
 		//g_EntityList = (IClientEntityList*)EasyInterface("client_panorama.dll", "VClientEntityList");
 	}

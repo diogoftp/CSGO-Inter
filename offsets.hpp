@@ -7,6 +7,9 @@ ptrdiff_t PatternScan(const char* module, const char* pattern, const char* mask,
 
 namespace offsets {
 	void Initialize();
+	inline uintptr_t dwClient = NULL;
+	inline uintptr_t dwEngine = NULL;
+
 	//NetVars
 	//DT_BasePlayer
 	inline ptrdiff_t m_iHealth = NULL;
@@ -34,6 +37,7 @@ namespace offsets {
 	inline ptrdiff_t dwLocalPlayer = NULL;
 	inline ptrdiff_t dwGlowObjectManager = NULL;
 	inline ptrdiff_t dwEntityList = NULL;
+	inline ptrdiff_t dwGetAllClasses = NULL;
 
 	//engine.dll
 	inline ptrdiff_t dwClientState = NULL;

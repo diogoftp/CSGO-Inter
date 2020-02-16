@@ -1,4 +1,4 @@
 # CSGO-Inter
 TODO:\
-1- Target Lock\
-2- Aimbot timer
+1- Organize code\
+2- Make selectable hotkeys

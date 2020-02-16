@@ -1,5 +1,4 @@
 #include <iostream>
-#include <atlbase.h>
 	
 #include <time.h>
 //#include <dwmapi.h>
@@ -45,19 +44,13 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	bool targetLock = false;
 	bool clearTarget = true;
 
-	USES_CONVERSION;
-	//uintptr_t dwClient = (uintptr_t)GetModuleHandleW(L"client_panorama.dll");
-	//uintptr_t dwEngine = (uintptr_t)GetModuleHandleW(L"engine.dll");
-	uintptr_t dwClient = (uintptr_t)GetModuleHandleW(CA2W(Decrypt("*% ,'=9('&;($(g-%%").c_str())); //client_panorama.dll
-	uintptr_t dwEngine = (uintptr_t)GetModuleHandleW(CA2W(Decrypt(",'. ',g-%%").c_str())); //engine.dll
-
-	Interfaces::Initialize();
+	//Interfaces::Initialize();
 	offsets::Initialize();
 
-	uintptr_t pLocalPlayer = dwClient + offsets::dwLocalPlayer;
-	uintptr_t pGlowObjectManager = dwClient + offsets::dwGlowObjectManager;
-	uintptr_t pEntityList = dwClient + offsets::dwEntityList;
-	uintptr_t pClientState = dwEngine + offsets::dwClientState;
+	uintptr_t pLocalPlayer = offsets::dwClient + offsets::dwLocalPlayer;
+	uintptr_t pGlowObjectManager = offsets::dwClient + offsets::dwGlowObjectManager;
+	uintptr_t pEntityList = offsets::dwClient + offsets::dwEntityList;
+	uintptr_t pClientState = offsets::dwEngine + offsets::dwClientState;
 
 	srand((unsigned int)time(0));
 
@@ -82,7 +75,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		//PRINTS
 		#ifdef DEBUG1
 		system("cls");;
-		//std::cout << Decrypt({ 0x2c, 0x27, 0x2e, 0x20, 0x27, 0x2c, 0x67, 0x2d, 0x25, 0x25 }) << std::endl;
 		std::cout << "FOV: " << aimbotFOV << std::endl << "Smooth: " << aimbotSmooth << std::endl;
 		std::cout << "[HOME]bRadar: " << bRadar << std::endl;
 		std::cout << "[DELETE]bESP: " << bESP << std::endl;
@@ -148,7 +140,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				if (entityList->entityListObjs[i].entity != NULL) {
 					if (entityList->entityListObjs[i].entity->dormant()) continue;
 					if (bRadar) Radar(entityList->entityListObjs[i].entity);
-					if (bESP) ESP(localPlayer, entityList->entityListObjs[i].entity, dwClient, GlowObjectManager);
+					if (bESP) ESP(localPlayer, entityList->entityListObjs[i].entity, offsets::dwClient, GlowObjectManager);
 				}
 			}
 		}
