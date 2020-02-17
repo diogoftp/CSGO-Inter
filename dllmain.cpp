@@ -97,7 +97,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		//Draw GUI
 		if (bMenu) {
 			UpdateWindow(hwnd);
-			ShowWindow(hwnd, SW_SHOW);
+			ShowWindow(hwnd, SW_SHOWNORMAL);
 			windowLoop(hwnd, msg, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
 		}
 		else {
