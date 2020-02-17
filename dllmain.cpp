@@ -23,9 +23,9 @@ D3DPRESENT_PARAMETERS    g_d3dpp = {};
 
 DWORD WINAPI LoopThread(HMODULE hModule) {
 	//GUI Setup
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC | CS_NOCLOSE | CS_HREDRAW | CS_VREDRAW, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, ("HehexD"), NULL };
+	WNDCLASSEX wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, ("HehexD"), NULL };
 	RegisterClassEx(&wc);
-	HWND hwnd = CreateWindow(wc.lpszClassName, "HehexD", WS_OVERLAPPED, 100, 100, 400, 400, NULL, NULL, wc.hInstance, NULL);
+	HWND hwnd = CreateWindow(wc.lpszClassName, "HehexD", WS_VISIBLE | WS_CAPTION, 100, 100, 400, 400, NULL, NULL, wc.hInstance, NULL);
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
@@ -39,6 +39,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true;
 
 	//Flags
+	bool setForeground = true;
 	bool aimKeyState = false;
 	bool aimKeyPrevState = false;
 	bool targetLock = false;
@@ -97,11 +98,16 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		//Draw GUI
 		if (bMenu) {
 			UpdateWindow(hwnd);
-			ShowWindow(hwnd, SW_SHOWNORMAL);
+			ShowWindow(hwnd, SW_RESTORE);
+			if (setForeground) {
+				SetForegroundWindow(hwnd);
+				setForeground = false;
+			}
 			windowLoop(hwnd, msg, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
 		}
 		else {
 			ShowWindow(hwnd, SW_HIDE);
+			setForeground = true;
 		}
 		//End Draw GUI
 

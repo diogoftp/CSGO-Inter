@@ -309,8 +309,3 @@ public:
 		return CallVFunction<DispatchUserMessage_t>(this, 38)(this, messageType, arg, arg1, data);
 	}*/
 };
-
-class C_BasePlayer {
-public:
-	virtual bool				IsPlayerDead() = 0;
-};

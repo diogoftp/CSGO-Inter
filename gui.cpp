@@ -112,7 +112,7 @@ void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, 
 
 	{
 
-		ImGui::Begin("Window");
+		ImGui::Begin("HehexD");
 
 		ImGui::Checkbox(Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP); //ESP
 		ImGui::Checkbox(Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar); //Radar
