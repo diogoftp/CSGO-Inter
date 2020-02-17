@@ -1,4 +1,2 @@
 # CSGO-Inter
-TODO:\
-1- Organize code\
-2- Make selectable hotkeys
+Simple CSGO internal hack for learning purposes.
