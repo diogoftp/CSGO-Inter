@@ -11,11 +11,12 @@ float RandomFloat(float min, float max);
 
 int isSpotted(Entity* localPlayer, Entity* target);
 
+void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot);
 void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot);
 Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV);
 Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt);
 
-void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles);
+void RCS(Entity* localPlayer, Vec3* viewAngles);
 
 //Vec3 getBestFOV(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV);
 //void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget);

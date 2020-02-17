@@ -125,13 +125,18 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		//Aimbot
 		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6) {
-			aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth, clearTarget, bRCSAimbot);
+			if (aimbotSmooth == 0) {
+				rageAimbot(localPlayer, entityList, viewAngles, aimbotFOV, bRCSAimbot);
+			}
+			else {
+				aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth, clearTarget, bRCSAimbot);
+			}
 			if (clearTarget == true) clearTarget = false;
 		}
 
 		//Standalone RCS
 		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6) {
-			RCS(localPlayer, entityList, viewAngles);
+			RCS(localPlayer, viewAngles);
 		}
 
 		//Radar and ESP

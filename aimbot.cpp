@@ -1,7 +1,7 @@
 #include "aimbot.hpp"
 #include "offsets.hpp"
 
-Vec3 oldAngle;
+Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
 Entity* aimTarget = nullptr;
 
 float mag3D(Vec3 vec) {
@@ -14,9 +14,6 @@ Vec3 calcAngle3D(Vec3 src, Vec3 dst) {
 	float hyp = mag3D(delta);
 	angles.x = (float)(asinf(delta.z / hyp)) * 180.0f / pi;
 	angles.y = (float)(atanf(delta.y / delta.x)) * 180.0f / pi;
-	//angles.x = atanf(delta.z / hyp) * 180.0f / pi;
-	//angles.y = atanf(delta.y / delta.x) * 180.0f / pi;
-	angles.z = 0.0f;
 	if (delta.x >= 0.0f) angles.y += 180.0f;
 	return angles;
 }
@@ -51,59 +48,80 @@ int isSpotted(Entity* localPlayer, Entity* target) {
 	return (bool)(mask & (1 << (localPlayer->clientId() - 1)));
 }
 
+void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot) {
+	Vec3 myAngle = *viewAngles;
+	aimTarget = getTarget(localPlayer, viewAngles, entityList, aimbotFOV);
+	if (aimTarget) {
+		Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
+		if (target.y > 180) target.y -= 360;
+		if (target.y < -180) target.y += 360;
+		if (abs(target.x) <= (aimbotFOV) && abs(target.y) <= (aimbotFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0) {
+			myAngle.x += target.x;
+			myAngle.y += target.y;
+			if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
+			if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
+
+			//RCS stuff
+			if (bRCSAimbot) {
+				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
+				currentPunch.x = currentPunch.x * 2;
+				currentPunch.y = currentPunch.y * 2;
+				if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+					myAngle = myAngle - currentPunch;
+				}
+			}
+			normalize(myAngle);
+			clamp(myAngle);
+			viewAngles->x = myAngle.x;
+			viewAngles->y = myAngle.y;
+		}
+	}
+	Sleep(50);
+}
+
 void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot) {
 	float aimbotOver = 0.14f;
 	float aimbotSmoothRand = 2.5f;
-	float RCSSmoothRand = 0.35f;
+	float aimbotSmoothRandRCS = 1.0f;
+	float RCSSmoothRand = 0.1f;
 	float dynFOV = 0.0f;
-	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.7f;
+	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.5f;
 	Vec3 myAngle = *viewAngles;
 
 	//Clear target lock
 	if (clearTarget == true) {
 		aimTarget = nullptr;
 	}
-
 	if (aimTarget == nullptr) {
-		aimTarget = getTarget(localPlayer, viewAngles, entityList, aimbotFOV + dynFOV);
+		//aimTarget = getTarget(localPlayer, viewAngles, entityList, aimbotFOV + dynFOV);
+		aimTarget = getTarget(localPlayer, &myAngle, entityList, aimbotFOV + dynFOV);
 	}
 	else {
-		Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
+		//Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
+		Vec3 target = calcTarget(localPlayer, &myAngle, aimTarget);
 		if (target.y > 180) target.y -= 360;
 		if (target.y < -180) target.y += 360;
-		if (abs(target.x) <= (aimbotFOV + dynFOV) && abs(target.y) <= (aimbotFOV + dynFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth >= 0) {
-			if (aimbotSmooth == 0) {
-				myAngle.x += target.x;
-				myAngle.y += target.y;
-				myAngle.z = 0.0f;
-				normalize(myAngle);
-				clamp(myAngle);
-				viewAngles->x = myAngle.x;
-				viewAngles->y = myAngle.y;
-				viewAngles->z = myAngle.z;
+		if (abs(target.x) <= (aimbotFOV + dynFOV) && abs(target.y) <= (aimbotFOV + dynFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth > 0) {
+			if (bRCSAimbot && *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 3) {
+				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
+				currentPunch.x *= 2.0f;
+				currentPunch.y *= 2.0f;
+				myAngle.x += (target.x - (currentPunch.x + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand))) / (aimbotSmooth + RandomFloat(0, aimbotSmoothRandRCS));
+				myAngle.y += (target.y - (currentPunch.y + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand))) / (aimbotSmooth + RandomFloat(0, aimbotSmoothRandRCS));
+				myAngle.x += RandomFloat(-1 * aimbotOver, aimbotOver);
+				myAngle.y += RandomFloat(-1 * aimbotOver, aimbotOver);
 			}
 			else {
 				myAngle.x += (target.x / (aimbotSmooth + RandomFloat(0, aimbotSmoothRand))) + RandomFloat(-1 * aimbotOver, aimbotOver);
 				myAngle.y += (target.y / (aimbotSmooth + RandomFloat(0, aimbotSmoothRand))) + RandomFloat(-1 * aimbotOver, aimbotOver);
-				if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
-				if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
-				myAngle.z = 0.0f;
-
-				//RCS stuff
-				if (bRCSAimbot) {
-					if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 3) {
-						Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_viewPunchAngle);
-						myAngle.x -= (currentPunch.x * 2.5f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
-						myAngle.y -= (currentPunch.y * 2.0f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
-					}
-				}
-
-				normalize(myAngle);
-				clamp(myAngle);
-				viewAngles->x = myAngle.x;
-				viewAngles->y = myAngle.y;
-				viewAngles->z = myAngle.z;
 			}
+			if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
+			if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
+
+			normalize(myAngle);
+			clamp(myAngle);
+			viewAngles->x = myAngle.x;
+			viewAngles->y = myAngle.y;
 		}
 	}
 	Sleep(50);
@@ -162,24 +180,25 @@ Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
 	return target;
 }
 
-void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles) {
+void RCS(Entity* localPlayer, Vec3* viewAngles) {
 	if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+		float RCSSmoothRand = 0.1f;
 		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
-		Vec3 myAngle = *viewAngles;
-		myAngle.x += oldAngle.x;
-		myAngle.y += oldAngle.y;
-
+		currentPunch.x = currentPunch.x * 2;
+		currentPunch.y = currentPunch.y * 2;
+		Vec3 myAngle = *viewAngles + oldAngle - currentPunch;
+		myAngle.x += RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
+		myAngle.y += RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
 		normalize(myAngle);
 		clamp(myAngle);
-		viewAngles->x = myAngle.x - currentPunch.x * 2;
-		viewAngles->y = myAngle.y - currentPunch.y * 2;
-		oldAngle.x = currentPunch.x * 2;
-		oldAngle.y = currentPunch.y * 2;
+		viewAngles->x = myAngle.x;
+		viewAngles->y = myAngle.y;
+		oldAngle = currentPunch;
 	}
 	else {
-		oldAngle.x = 0.0f;
-		oldAngle.y = 0.0f;
+		oldAngle = { 0, 0, 0 };
 	}
+	Sleep(50);
 }
 
 /*bool IsVisible(Entity* pLocal, Entity* pEnt) {
@@ -230,60 +249,4 @@ void RCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles) {
 		}
 	}
 	return target;
-}*/
-
-/*void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget) {
-	float aimbotOver = 0.14f;
-	float aimbotSmoothRand = 2.5f;
-	float RCSSmoothRand = 0.35f;
-	float dynFOV = 0.0f;
-	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.7f;
-	Vec3 myAngle = *viewAngles;
-
-	//Clear target lock
-	if (clearTarget == true) {
-		aimTarget = nullptr;
-	}
-
-	if (aimTarget == nullptr) {
-		aimTarget = getTarget(localPlayer, viewAngles, entityList, aimbotFOV + dynFOV);
-	}
-	else {
-		Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
-		if (target.y > 180) target.y -= 360;
-		if (target.y < -180) target.y += 360;
-		if (abs(target.x) <= (aimbotFOV + dynFOV) && abs(target.y) <= (aimbotFOV + dynFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth >= 0) {
-			if (aimbotSmooth == 0) {
-				myAngle.x += target.x;
-				myAngle.y += target.y;
-				myAngle.z = 0.0f;
-				normalize(myAngle);
-				clamp(myAngle);
-				viewAngles->x = myAngle.x;
-				viewAngles->y = myAngle.y;
-				viewAngles->z = myAngle.z;
-			}
-			else {
-				myAngle.x += (target.x / (aimbotSmooth + RandomFloat(0, aimbotSmoothRand))) + RandomFloat(-1 * aimbotOver, aimbotOver);
-				myAngle.y += (target.y / (aimbotSmooth + RandomFloat(0, aimbotSmoothRand))) + RandomFloat(-1 * aimbotOver, aimbotOver);
-				if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
-				if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
-				myAngle.z = 0.0f;
-
-				//RCS stuff
-				if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 3) {
-					Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_viewPunchAngle);
-					myAngle.x -= (currentPunch.x * 2.5f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
-					myAngle.y -= (currentPunch.y * 2.0f) + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
-				}
-
-				normalize(myAngle);
-				clamp(myAngle);
-				viewAngles->x = myAngle.x;
-				viewAngles->y = myAngle.y;
-				viewAngles->z = myAngle.z;
-			}
-		}
-	}
-	Sleep(50);
 }*/
