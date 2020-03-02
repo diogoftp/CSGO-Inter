@@ -1,8 +1,6 @@
 #include <iostream>
 	
 #include <time.h>
-//#include <dwmapi.h>
-//#pragma comment(lib, "dwmapi.lib")
 
 #include "SDK/SDK.hpp"
 #include "xor.hpp"
@@ -23,10 +21,15 @@ D3DPRESENT_PARAMETERS    g_d3dpp = {};
 
 DWORD WINAPI LoopThread(HMODULE hModule) {
 	//GUI Setup
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, ("HehexD"), NULL };
+	RECT desktop;
+	const HWND hDesktop = GetDesktopWindow();
+	GetWindowRect(hDesktop, &desktop);
+	int hsize = desktop.right;
+	int vsize = desktop.bottom;
+	WNDCLASSEX wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, ("HehexDD"), NULL };
 	RegisterClassEx(&wc);
-	HWND hwnd = CreateWindow(wc.lpszClassName, "HehexD", WS_VISIBLE | WS_CAPTION, 100, 100, 400, 400, NULL, NULL, wc.hInstance, NULL);
-
+	HWND hwnd = CreateWindowEx(WS_EX_LAYERED, wc.lpszClassName, wc.lpszClassName, WS_POPUP, 0, 0, hsize, vsize, NULL, NULL, wc.hInstance, NULL);
+	SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 255, LWA_ALPHA | LWA_COLORKEY);
 	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
 	int teste = guiSetup(hwnd, wc);
@@ -75,7 +78,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		//PRINTS
 		#ifdef DEBUG1
-		system("cls");;
+		system("cls");
 		std::cout << "FOV: " << aimbotFOV << std::endl << "Smooth: " << aimbotSmooth << std::endl;
 		std::cout << "[HOME]bRadar: " << bRadar << std::endl;
 		std::cout << "[DELETE]bESP: " << bESP << std::endl;
@@ -103,7 +106,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				SetForegroundWindow(hwnd);
 				setForeground = false;
 			}
-			windowLoop(hwnd, msg, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
+			windowLoop(hwnd, msg, hsize, vsize, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
 		}
 		else {
 			ShowWindow(hwnd, SW_HIDE);

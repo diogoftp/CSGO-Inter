@@ -18,5 +18,5 @@ void CleanupDeviceD3D();
 void ResetDevice();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 int guiSetup(HWND hwnd, WNDCLASSEX wc);
-void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot);
+void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot);
 void guiEnd(HWND hwnd, WNDCLASSEX wc);

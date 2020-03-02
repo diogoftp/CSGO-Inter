@@ -93,7 +93,7 @@ int guiSetup(HWND hwnd, WNDCLASSEX wc) {
 	return 0;
 }
 
-void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot) {
+void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot) {
 	// Poll and handle messages (inputs, window resize, etc.)
 // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -109,10 +109,16 @@ void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+	//window_flags |= ImGuiWindowFlags_NoBackground;
+	//window_flags |= ImGuiWindowFlags_NoTitleBar;
+	//window_flags |= ImGuiWindowFlags_NoDecoration;
 
 	{
-
-		ImGui::Begin("HehexD");
+		//ImGui::SetNextWindowBgAlpha(255.0f);
+		ImGui::SetNextWindowSize(ImVec2(350, 200));
+		ImGui::SetNextWindowPos(ImVec2(float((hsize-350)/2), float((vsize-200)/2)));
+		ImGui::Begin("HehexD", NULL, window_flags);
 
 		ImGui::Checkbox(Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP); //ESP
 		ImGui::Checkbox(Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar); //Radar
@@ -133,8 +139,7 @@ void windowLoop(HWND hwnd, MSG msg, bool* bESP, bool* bRadar, float* aimbotFOV, 
 	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, false);
 	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 	g_pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(clear_color.x * 255.0f), (int)(clear_color.y * 255.0f), (int)(clear_color.z * 255.0f), (int)(clear_color.w * 255.0f));
+	D3DCOLOR clear_col_dx = D3DCOLOR_RGBA(0, 0, 0, 0);
 	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, clear_col_dx, 1.0f, 0);
 	if (g_pd3dDevice->BeginScene() >= 0) {
 		ImGui::Render();
