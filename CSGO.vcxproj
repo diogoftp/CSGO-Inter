@@ -189,6 +189,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ESP.cpp" />
     <ClCompile Include="gui.cpp" />
+    <ClCompile Include="hooks.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -199,6 +200,7 @@
     <ClCompile Include="memHelper.cpp" />
     <ClCompile Include="offsets.cpp" />
     <ClCompile Include="radar.cpp" />
+    <ClCompile Include="SDK\vec3.cpp" />
     <ClCompile Include="SDK\vector2D.cpp" />
     <ClCompile Include="SDK\VMatrix.cpp" />
     <ClCompile Include="xor.cpp" />
@@ -207,6 +209,7 @@
     <ClInclude Include="aimbot.hpp" />
     <ClInclude Include="ESP.hpp" />
     <ClInclude Include="gui.hpp" />
+    <ClInclude Include="hooks.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx9.h" />
@@ -219,9 +222,11 @@
     <ClInclude Include="memHelper.hpp" />
     <ClInclude Include="offsets.hpp" />
     <ClInclude Include="radar.hpp" />
+    <ClInclude Include="SDK\IEngineTrace2.hpp" />
     <ClInclude Include="SDK\IVEngineClient.hpp" />
     <ClInclude Include="SDK\QAngle.hpp" />
     <ClInclude Include="SDK\SDK.hpp" />
+    <ClInclude Include="SDK\vec3.hpp" />
     <ClInclude Include="SDK\vector.hpp" />
     <ClInclude Include="SDK\vector2D.hpp" />
     <ClInclude Include="SDK\VMatrix.hpp" />

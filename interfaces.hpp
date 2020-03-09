@@ -1,5 +1,6 @@
 #pragma once
 #include "SDK/SDK.hpp"
+#include "SDK/IEngineTrace2.hpp"
 
 namespace Interfaces {
 	void Initialize();
@@ -7,7 +8,7 @@ namespace Interfaces {
 //inline IBaseClientDLL* g_BaseClientDLL = nullptr;
 //inline IVEngineClient* g_EngineClient = nullptr;
 //inline IClientEntityList* g_EntityList = nullptr;
-//inline IEngineTrace* g_EngineTrace = nullptr;
+inline IEngineTrace* g_EngineTrace = nullptr;
 
 void* CaptureInterface(const char* moduleName, const char* interfaceName);
 void* EasyInterface(const char* _Module, const char* _Object);

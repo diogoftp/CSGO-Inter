@@ -3,8 +3,9 @@
 #include <Psapi.h>
 #include "SDK/IVEngineClient.hpp"
 #include "../offsets.hpp"
+#include "SDK/vec3.hpp"
 
-class Vec3 {
+/*class Vec3 {
 public:
 	float x;
 	float y;
@@ -37,7 +38,7 @@ public:
 		res.z = this->z - vec.z;
 		return res;
 	}
-};
+};*/
 
 class Entity {
 public:
@@ -75,8 +76,6 @@ class EntList {
 public:
 	EntityListObj entityListObjs[32];	//0x0
 };										//0x200
-
-
 
 class CBaseHandle;
 

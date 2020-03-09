@@ -1,5 +1,9 @@
 #include "aimbot.hpp"
 #include "offsets.hpp"
+#include "interfaces.hpp"
+#include <iostream>
+
+tTraceRay TraceRay;
 
 Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
 Entity* aimTarget = nullptr;
@@ -42,10 +46,39 @@ float RandomFloat(float min, float max) {
 	return min + r;
 }
 
-int isSpotted(Entity* localPlayer, Entity* target) {
+bool isSpotted(Entity* localPlayer, Entity* target) {
 	int mask;
 	mask = *(int*)((uintptr_t)target + offsets::m_bSpottedByMask);
 	return (bool)(mask & (1 << (localPlayer->clientId() - 1)));
+}
+
+bool isVisible(Entity* localPlayer, Entity* target) {
+	CTraceFilter tracefilter;
+	Ray_t ray;
+	CGameTrace trace;
+
+	Vec3 me = localPlayer->origin() + localPlayer->viewOffset();
+	Vec3 en = getBonePos(target, 7);
+
+	tracefilter.pSkip = (void*)localPlayer;
+	ray.Init(me, en);
+	
+	g_EngineTrace->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &tracefilter, &trace);
+	if (target == trace.hit_entity) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+Vec3 getBonePos(Entity* target, int bone) {
+	uintptr_t BoneBase = *(uintptr_t*)(target + offsets::m_dwBoneMatrix);
+	Vec3 bones;
+	bones.x = *(float*)(BoneBase + 0x30 * bone + 0x0C);
+	bones.y = *(float*)(BoneBase + 0x30 * bone + 0x1C);
+	bones.z = *(float*)(BoneBase + 0x30 * bone + 0x2C);
+	return bones;
 }
 
 void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot) {
@@ -76,7 +109,7 @@ void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, floa
 			viewAngles->y = myAngle.y;
 		}
 	}
-	Sleep(50);
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot) {
@@ -87,17 +120,15 @@ void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, flo
 	float dynFOV = 0.0f;
 	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.5f;
 	Vec3 myAngle = *viewAngles;
-
+	
 	//Clear target lock
 	if (clearTarget == true) {
 		aimTarget = nullptr;
 	}
 	if (aimTarget == nullptr) {
-		//aimTarget = getTarget(localPlayer, viewAngles, entityList, aimbotFOV + dynFOV);
 		aimTarget = getTarget(localPlayer, &myAngle, entityList, aimbotFOV + dynFOV);
 	}
 	else {
-		//Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
 		Vec3 target = calcTarget(localPlayer, &myAngle, aimTarget);
 		if (target.y > 180) target.y -= 360;
 		if (target.y < -180) target.y += 360;
@@ -124,7 +155,7 @@ void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, flo
 			viewAngles->y = myAngle.y;
 		}
 	}
-	Sleep(50);
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV) {
@@ -134,12 +165,7 @@ Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, fl
 
 	for (unsigned short int i = 0; i < 32; i++) {
 		if (entityList->entityListObjs[i].entity && isSpotted(localPlayer, entityList->entityListObjs[i].entity) && entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->lifeState() == 0 && entityList->entityListObjs[i].entity->health() > 0 && entityList->entityListObjs[i].entity->team() != localPlayer->team() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
-			uintptr_t BaseAddress = (uintptr_t)(entityList->entityListObjs[i].entity);
-			uintptr_t BoneBase = *(uintptr_t*)(BaseAddress + offsets::m_dwBoneMatrix);
-			Vec3 bones;
-			bones.x = *(float*)(BoneBase + 0x30 * 7 + 0x0C);
-			bones.y = *(float*)(BoneBase + 0x30 * 7 + 0x1C);
-			bones.z = *(float*)(BoneBase + 0x30 * 7 + 0x2C);
+			Vec3 bones = getBonePos(entityList->entityListObjs[i].entity, 7);
 			Vec3 lpView = localPlayer->viewOffset();
 			Vec3 myeyes = localPlayer->origin() + lpView;
 			Vec3 aimDest = calcAngle3D(myeyes, bones);
@@ -162,12 +188,7 @@ Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, fl
 Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
 	Vec3 target;
 	if (targetEnt && isSpotted(localPlayer, targetEnt) && targetEnt->clientId() != localPlayer->clientId() && targetEnt->lifeState() == 0 && targetEnt->health() > 0 && targetEnt->team() != localPlayer->team() && targetEnt->dormant() != TRUE) {
-		uintptr_t BaseAddress = (uintptr_t)(targetEnt);
-		uintptr_t BoneBase = *(uintptr_t*)(BaseAddress + offsets::m_dwBoneMatrix);
-		Vec3 bones;
-		bones.x = *(float*)(BoneBase + 0x30 * 7 + 0x0C);
-		bones.y = *(float*)(BoneBase + 0x30 * 7 + 0x1C);
-		bones.z = *(float*)(BoneBase + 0x30 * 7 + 0x2C);
+		Vec3 bones = getBonePos(targetEnt, 7);
 		Vec3 lpView = localPlayer->viewOffset();
 		Vec3 myeyes = localPlayer->origin() + lpView;
 		Vec3 aimDest = calcAngle3D(myeyes, bones);
@@ -198,7 +219,7 @@ void RCS(Entity* localPlayer, Vec3* viewAngles) {
 	else {
 		oldAngle = { 0, 0, 0 };
 	}
-	Sleep(50);
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 /*bool IsVisible(Entity* pLocal, Entity* pEnt) {
@@ -217,36 +238,4 @@ void RCS(Entity* localPlayer, Vec3* viewAngles) {
 			return tr.fraction > 0.97f;
 		}
 	return false;
-}*/
-
-/*Vec3 getBestFOV(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV) {
-	float oldDistance = FLT_MAX;
-	float newDistance = 0;
-	Vec3 target;
-
-	for (unsigned short int i = 0; i < 32; i++) {
-		if (entityList->entityListObjs[i].entity && isSpotted(localPlayer, entityList->entityListObjs[i].entity) && entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->lifeState() == 0 && entityList->entityListObjs[i].entity->health() > 0 && entityList->entityListObjs[i].entity->team() != localPlayer->team() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
-			uintptr_t BaseAddress = (uintptr_t)(entityList->entityListObjs[i].entity);
-			uintptr_t BoneBase = *(uintptr_t*)(BaseAddress + offsets::m_dwBoneMatrix);
-			Vec3 bones;
-			bones.x = *(float*)(BoneBase + 0x30 * 7 + 0x0C);
-			bones.y = *(float*)(BoneBase + 0x30 * 7 + 0x1C);
-			bones.z = *(float*)(BoneBase + 0x30 * 7	 + 0x2C);
-			Vec3 lpView = localPlayer->viewOffset();
-			Vec3 myeyes = localPlayer->origin() + lpView;
-			Vec3 aimDest = calcAngle3D(myeyes, bones);
-
-			Vec3 diff = aimDest - *viewAngles;
-			if (diff.y > 180) diff.y -= 360;
-			if (diff.y < -180) diff.y += 360;
-			if (abs(diff.x) <= aimbotFOV && abs(diff.y) <= aimbotFOV) {
-				newDistance = abs(mag3D(diff));
-				if (newDistance < oldDistance) {
-					oldDistance = newDistance;
-					target = diff;
-				}
-			}
-		}
-	}
-	return target;
 }*/

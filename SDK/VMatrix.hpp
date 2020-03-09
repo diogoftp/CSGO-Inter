@@ -5,16 +5,6 @@
 #include "vector.hpp"
 #include "QAngle.hpp"
 
-struct cplane_t
-{
-    Vector normal;
-    float dist;
-    uint8_t type;   // for fast side tests
-    uint8_t signbits;  // signx + (signy<<1) + (signz<<1)
-    uint8_t pad[2];
-
-};
-
 class matrix3x4_t
 {
 public:

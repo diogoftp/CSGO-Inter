@@ -1,11 +1,14 @@
 #include <iostream>
 	
 #include <time.h>
+#include <thread>
+#include <chrono>
 
 #include "SDK/SDK.hpp"
 #include "xor.hpp"
 #include "interfaces.hpp"
 #include "offsets.hpp"
+//#include "hooks.hpp"
 
 #include "gui.hpp"
 #include "ESP.hpp"
@@ -48,8 +51,9 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	bool targetLock = false;
 	bool clearTarget = true;
 
-	//Interfaces::Initialize();
+	Interfaces::Initialize();
 	offsets::Initialize();
+	
 
 	uintptr_t pLocalPlayer = offsets::dwClient + offsets::dwLocalPlayer;
 	uintptr_t pGlowObjectManager = offsets::dwClient + offsets::dwGlowObjectManager;
@@ -64,6 +68,8 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	FILE* f;
 	freopen_s(&f, "CONOUT$", "w", stdout);
 	#endif // DEBUG1
+
+	//if (startHook() != 0) MessageBoxA(0, "ERRO", "ERRO", MB_OK);
 
 	EntList* entityList = (EntList*)pEntityList;
 	while (!GetAsyncKeyState(VK_INSERT)) {
@@ -148,6 +154,20 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 			RCS(localPlayer, viewAngles);
 		}
 
+		//TRay
+		if (GetAsyncKeyState(VK_END) && GameState == 6) {
+			std::cout << "Inter: " << g_EngineTrace << std::endl;
+			for (unsigned short int i = 0; i < 32; i++) {
+				if (entityList->entityListObjs[i].entity != NULL) {
+					if (entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
+						if (isVisible(localPlayer, entityList->entityListObjs[i].entity)) {
+							std::cout << "Visible: " << entityList->entityListObjs[i].entity->clientId() << std::endl;
+						}
+					}
+				}
+			}
+		}
+
 		//Radar and ESP
 		if ((bRadar || bESP) && GameState == 6) {
 			for (unsigned short int i = 0; i < 32; i++) {
@@ -158,8 +178,15 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				}
 			}
 		}
-		Sleep(5);
+
+		/*if (GetAsyncKeyState(VK_END)) {
+			endHook();
+		}*/
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
+
+	//endHook();
+	guiEnd(hwnd, wc);
 
 	//PRINTS
 	#ifdef DEBUG1
@@ -167,16 +194,12 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	FreeConsole();
 	#endif // DEBUG1
 
-	guiEnd(hwnd, wc);
-
 	FreeLibraryAndExitThread(hModule, 0);
 	return 0;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, uintptr_t ul_reason_for_call, LPVOID lpReserved) {
-	HWND hwndGoto = NULL;
-	switch (ul_reason_for_call)
-	{
+	switch (ul_reason_for_call)	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
 		//CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)LoopThread, hModule, 0, nullptr));

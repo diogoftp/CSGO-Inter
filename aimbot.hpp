@@ -1,4 +1,6 @@
 #pragma once
+#include <thread>
+#include <chrono>
 #include "SDK/SDK.hpp"
 
 const float pi = 3.14159265358979323846f;
@@ -9,7 +11,9 @@ Vec3 clamp(Vec3 angles);
 Vec3 normalize(Vec3 angles);
 float RandomFloat(float min, float max);
 
-int isSpotted(Entity* localPlayer, Entity* target);
+bool isSpotted(Entity* localPlayer, Entity* target);
+bool isVisible(Entity* localPlayer, Entity* target);
+Vec3 getBonePos(Entity* target, int bone);
 
 void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot);
 void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot);
@@ -17,6 +21,3 @@ Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, fl
 Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt);
 
 void RCS(Entity* localPlayer, Vec3* viewAngles);
-
-//Vec3 getBestFOV(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV);
-//void aimbotRCS(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget);
