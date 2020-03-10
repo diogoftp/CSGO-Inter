@@ -4,41 +4,7 @@
 #include "SDK/IVEngineClient.hpp"
 #include "../offsets.hpp"
 #include "SDK/vec3.hpp"
-
-/*class Vec3 {
-public:
-	float x;
-	float y;
-	float z;
-
-	Vec3() {
-		x = 0;
-		y = 0;
-		z = 0;
-	}
-
-	Vec3(float x, float y, float z) {
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
-	Vec3 operator + (Vec3& vec) {
-		Vec3 res;
-		res.x = this->x + vec.x;
-		res.y = this->y + vec.y;
-		res.z = this->z + vec.z;
-		return res;
-	}
-
-	Vec3 operator - (Vec3& vec) {
-		Vec3 res;
-		res.x = this->x - vec.x;
-		res.y = this->y - vec.y;
-		res.z = this->z - vec.z;
-		return res;
-	}
-};*/
+#include "IClientMode.hpp"
 
 class Entity {
 public:
@@ -46,23 +12,23 @@ public:
 		return *(int32_t*)((uintptr_t)this + 0x64);
 	}
 	bool dormant() {
-		return *(bool*)((uintptr_t)this + offsets::m_bDormant);
+		return *(bool*)((uintptr_t)this + Offsets::m_bDormant);
 	}
 	int32_t health() {
-		return *(uint32_t*)((uintptr_t)this + offsets::m_iHealth);
+		return *(uint32_t*)((uintptr_t)this + Offsets::m_iHealth);
 	}
 	int32_t team() {
-		return *(uint32_t*)((uintptr_t)this + offsets::m_iTeamNum);
+		return *(uint32_t*)((uintptr_t)this + Offsets::m_iTeamNum);
 	}
 	Vec3 origin() {
-		return *(Vec3*)((uintptr_t)this + offsets::m_vecOrigin);
+		return *(Vec3*)((uintptr_t)this + Offsets::m_vecOrigin);
 	}
 
 	int8_t lifeState() {
-		return *(int8_t*)((uintptr_t)this + offsets::m_lifeState);
+		return *(int8_t*)((uintptr_t)this + Offsets::m_lifeState);
 	}
 	Vec3 viewOffset() {
-		return *(Vec3*)((uintptr_t)this + offsets::m_vecViewOffset);
+		return *(Vec3*)((uintptr_t)this + Offsets::m_vecViewOffset);
 	}
 };
 

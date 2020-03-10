@@ -75,8 +75,8 @@ ptrdiff_t PatternScan(const char* module, const char* pattern, const char* mask,
 	return result;
 }
 
-namespace offsets {
-	void Initialize() {
+namespace Offsets {
+	void Setup() {
 		dwClient = (uintptr_t)GetModuleHandleA(client_panoramadllSTR);
 		dwEngine = (uintptr_t)GetModuleHandleA(enginedllSTR);
 
@@ -92,34 +92,34 @@ namespace offsets {
 		dwClientState = PatternScan(enginedllSTR, "\xA1\x00\x00\x00\x00\x33\xD2\x6A\x00\x6A\x00\x33\xC9\x89\xB0", "x????xxxxxxxxxx", { 1 }, 0, true);
 		dwClientState_State = PatternScan(enginedllSTR, "\x83\xB8\x00\x00\x00\x00\x00\x0F\x94\xC0\xC3", "xx?????xxxx", { 2 }, 0, false);
 		dwClientState_ViewAngles = PatternScan(enginedllSTR, "\xF3\x0F\x11\x80\x00\x00\x00\x00\xD9\x46\x04\xD9\x05", "xxxx????xxxxx", { 4 }, 0, false);
-		//dwGlobalVars = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xFF\x50\x08\x85\xC0", "x????x????xxxxx", { 1 }, 0, true);
+		dwGlobalVars = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xFF\x50\x08\x85\xC0", "x????x????xxxxx", { 1 }, 0, true);
 
 		//Netvars
 		//DT_BasePlayer
-		//m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, aaag_BaseClientDLL->GetAllClasses());
-		//m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, bbb((ClientClass*)(dwClient + offsets::dwGetAllClasses)));
+		//m_iHealth = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, aaag_BaseClientDLL->GetAllClasses());
+		//m_iHealth = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, bbb((ClientClass*)(dwClient + Offsets::dwGetAllClasses)));
 		
-		m_iHealth = GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_iTeamNum = GetNetVarOffset(DT_BasePlayerSTR, m_iTeamNumSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_vecOrigin = GetNetVarOffset(DT_BasePlayerSTR, m_vecOriginSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_aimPunchAngle = GetNetVarOffset(DT_BasePlayerSTR, m_aimPunchAngleSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_viewPunchAngle = GetNetVarOffset(DT_BasePlayerSTR, m_viewPunchAngleSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_iHealth = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_iTeamNum = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iTeamNumSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_vecOrigin = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_vecOriginSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_aimPunchAngle = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_aimPunchAngleSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_viewPunchAngle = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_viewPunchAngleSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 
 		//DT_CSPlayer
-		m_lifeState = GetNetVarOffset(DT_CSPlayerSTR, m_lifeStateSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_vecViewOffset = GetNetVarOffset(DT_CSPlayerSTR, m_vecViewOffsetSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_iGlowIndex = GetNetVarOffset(DT_CSPlayerSTR, m_flFlashDurationSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses)) + 24;
-		m_iShotsFired = GetNetVarOffset(DT_CSPlayerSTR, m_iShotsFiredSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_lifeState = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_lifeStateSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_vecViewOffset = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_vecViewOffsetSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_iGlowIndex = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_flFlashDurationSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses)) + 24;
+		m_iShotsFired = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_iShotsFiredSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 
 		//DT_BaseEntity
-		m_bSpotted = GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
-		m_bSpottedByMask = GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedByMaskSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		m_bSpotted = Interfaces::GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_bSpottedByMask = Interfaces::GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedByMaskSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 
 		//DT_BaseAnimating
-		m_dwBoneMatrix = GetNetVarOffset(DT_BaseAnimatingSTR, m_nForceBoneSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses)) + 28;
+		m_dwBoneMatrix = Interfaces::GetNetVarOffset(DT_BaseAnimatingSTR, m_nForceBoneSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses)) + 28;
 
 		//DT_MaterialModifyControl
-		//m_flFramerate = GetNetVarOffset(DT_MaterialModifyControlSTR, m_flFramerateSTR, (ClientClass*)(dwClient + offsets::dwGetAllClasses));
+		//m_flFramerate = Interfaces::GetNetVarOffset(DT_MaterialModifyControlSTR, m_flFramerateSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 
 		
 	}

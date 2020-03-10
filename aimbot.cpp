@@ -8,11 +8,18 @@ tTraceRay TraceRay;
 Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
 Entity* aimTarget = nullptr;
 
-float mag3D(Vec3 vec) {
+aimbot::aimbot() {
+
+}
+aimbot::~aimbot() {
+
+}
+
+float aimbot::mag3D(Vec3 vec) {
 	return sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
-Vec3 calcAngle3D(Vec3 src, Vec3 dst) {
+Vec3 aimbot::calcAngle3D(Vec3 src, Vec3 dst) {
 	Vec3 angles;
 	Vec3 delta = src - dst;
 	float hyp = mag3D(delta);
@@ -22,7 +29,7 @@ Vec3 calcAngle3D(Vec3 src, Vec3 dst) {
 	return angles;
 }
 
-Vec3 clamp(Vec3 angles) {
+Vec3 aimbot::clamp(Vec3 angles) {
 	if (angles.y > 180.0f) angles.y = 180.0f;
 	else if (angles.y < -180.0f) angles.y = -180.0f;
 	if (angles.x > 89.0f) angles.x = 89.0f;
@@ -31,7 +38,7 @@ Vec3 clamp(Vec3 angles) {
 	return angles;
 }
 
-Vec3 normalize(Vec3 angles) {
+Vec3 aimbot::normalize(Vec3 angles) {
 	while (angles.x > 89.0f) angles.x -= 180.0f;
 	while (angles.x < -89.0f) angles.x += 180.0f;
 	while (angles.y > 180.0f) angles.y -= 360.0f;
@@ -39,20 +46,20 @@ Vec3 normalize(Vec3 angles) {
 	return angles;
 }
 
-float RandomFloat(float min, float max) {
+float aimbot::RandomFloat(float min, float max) {
 	float random = ((float)rand()) / (float)RAND_MAX;
 	float diff = max - min;
 	float r = random * diff;
 	return min + r;
 }
 
-bool isSpotted(Entity* localPlayer, Entity* target) {
+bool aimbot::isSpotted(Entity* localPlayer, Entity* target) {
 	int mask;
-	mask = *(int*)((uintptr_t)target + offsets::m_bSpottedByMask);
+	mask = *(int*)((uintptr_t)target + Offsets::m_bSpottedByMask);
 	return (bool)(mask & (1 << (localPlayer->clientId() - 1)));
 }
 
-bool isVisible(Entity* localPlayer, Entity* target) {
+bool aimbot::isVisible(Entity* localPlayer, Entity* target) {
 	CTraceFilter tracefilter;
 	Ray_t ray;
 	CGameTrace trace;
@@ -63,7 +70,7 @@ bool isVisible(Entity* localPlayer, Entity* target) {
 	tracefilter.pSkip = (void*)localPlayer;
 	ray.Init(me, en);
 	
-	g_EngineTrace->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &tracefilter, &trace);
+	Interfaces::g_EngineTrace->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &tracefilter, &trace);
 	if (target == trace.hit_entity) {
 		return true;
 	}
@@ -72,8 +79,8 @@ bool isVisible(Entity* localPlayer, Entity* target) {
 	}
 }
 
-Vec3 getBonePos(Entity* target, int bone) {
-	uintptr_t BoneBase = *(uintptr_t*)(target + offsets::m_dwBoneMatrix);
+Vec3 aimbot::getBonePos(Entity* target, int bone) {
+	uintptr_t BoneBase = *(uintptr_t*)(target + Offsets::m_dwBoneMatrix);
 	Vec3 bones;
 	bones.x = *(float*)(BoneBase + 0x30 * bone + 0x0C);
 	bones.y = *(float*)(BoneBase + 0x30 * bone + 0x1C);
@@ -81,7 +88,7 @@ Vec3 getBonePos(Entity* target, int bone) {
 	return bones;
 }
 
-void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot) {
+void aimbot::rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot) {
 	Vec3 myAngle = *viewAngles;
 	aimTarget = getTarget(localPlayer, viewAngles, entityList, aimbotFOV);
 	if (aimTarget) {
@@ -96,10 +103,10 @@ void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, floa
 
 			//RCS stuff
 			if (bRCSAimbot) {
-				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
+				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + Offsets::m_aimPunchAngle);
 				currentPunch.x = currentPunch.x * 2;
 				currentPunch.y = currentPunch.y * 2;
-				if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+				if (*(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) > 1) {
 					myAngle = myAngle - currentPunch;
 				}
 			}
@@ -112,13 +119,13 @@ void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, floa
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot) {
+void aimbot::aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot) {
 	float aimbotOver = 0.14f;
 	float aimbotSmoothRand = 2.5f;
 	float aimbotSmoothRandRCS = 1.0f;
 	float RCSSmoothRand = 0.1f;
 	float dynFOV = 0.0f;
-	dynFOV = *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) * 0.5f;
+	dynFOV = *(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) * 0.5f;
 	Vec3 myAngle = *viewAngles;
 	
 	//Clear target lock
@@ -133,8 +140,8 @@ void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, flo
 		if (target.y > 180) target.y -= 360;
 		if (target.y < -180) target.y += 360;
 		if (abs(target.x) <= (aimbotFOV + dynFOV) && abs(target.y) <= (aimbotFOV + dynFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth > 0) {
-			if (bRCSAimbot && *(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 3) {
-				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
+			if (bRCSAimbot && *(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) > 3) {
+				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + Offsets::m_aimPunchAngle);
 				currentPunch.x *= 2.0f;
 				currentPunch.y *= 2.0f;
 				myAngle.x += (target.x - (currentPunch.x + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand))) / (aimbotSmooth + RandomFloat(0, aimbotSmoothRandRCS));
@@ -158,7 +165,7 @@ void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, flo
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV) {
+Entity* aimbot::getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV) {
 	float oldDistance = FLT_MAX;
 	float newDistance = 0;
 	Entity* targetEnt = nullptr;
@@ -185,7 +192,7 @@ Entity* getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, fl
 	return targetEnt;
 }
 
-Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
+Vec3 aimbot::calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
 	Vec3 target;
 	if (targetEnt && isSpotted(localPlayer, targetEnt) && targetEnt->clientId() != localPlayer->clientId() && targetEnt->lifeState() == 0 && targetEnt->health() > 0 && targetEnt->team() != localPlayer->team() && targetEnt->dormant() != TRUE) {
 		Vec3 bones = getBonePos(targetEnt, 7);
@@ -201,10 +208,10 @@ Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
 	return target;
 }
 
-void RCS(Entity* localPlayer, Vec3* viewAngles) {
-	if (*(int*)((uintptr_t)localPlayer + offsets::m_iShotsFired) > 1) {
+void aimbot::RCS(Entity* localPlayer, Vec3* viewAngles) {
+	if (*(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) > 1) {
 		float RCSSmoothRand = 0.1f;
-		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + offsets::m_aimPunchAngle);
+		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + Offsets::m_aimPunchAngle);
 		currentPunch.x = currentPunch.x * 2;
 		currentPunch.y = currentPunch.y * 2;
 		Vec3 myAngle = *viewAngles + oldAngle - currentPunch;
@@ -221,21 +228,3 @@ void RCS(Entity* localPlayer, Vec3* viewAngles) {
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
-
-/*bool IsVisible(Entity* pLocal, Entity* pEnt) {
-		Ray_t ray;
-		trace_t tr;
-		Vector localEye, entEye;
-		if (GetBonePosition(pLocal, localEye, 10) && GetBonePosition(pEnt, entEye, 10)) {
-			ray.Init(localEye, entEye);
-			CTraceFilter traceFilter;
-			traceFilter.pSkip = pLocal;
-			g_pTrace->TraceRay(ray, 0x4600400B, &traceFilter, &tr);
-
-			if (tr.allsolid || tr.startsolid)
-				return false;
-
-			return tr.fraction > 0.97f;
-		}
-	return false;
-}*/

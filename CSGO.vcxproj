@@ -197,7 +197,6 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="interfaces.cpp" />
-    <ClCompile Include="memHelper.cpp" />
     <ClCompile Include="offsets.cpp" />
     <ClCompile Include="radar.cpp" />
     <ClCompile Include="SDK\vec3.cpp" />
@@ -219,10 +218,11 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="interfaces.hpp" />
-    <ClInclude Include="memHelper.hpp" />
     <ClInclude Include="offsets.hpp" />
     <ClInclude Include="radar.hpp" />
-    <ClInclude Include="SDK\IEngineTrace2.hpp" />
+    <ClInclude Include="SDK\GlobalVars.hpp" />
+    <ClInclude Include="SDK\IClientMode.hpp" />
+    <ClInclude Include="SDK\IEngineTrace.hpp" />
     <ClInclude Include="SDK\IVEngineClient.hpp" />
     <ClInclude Include="SDK\QAngle.hpp" />
     <ClInclude Include="SDK\SDK.hpp" />
@@ -230,6 +230,7 @@
     <ClInclude Include="SDK\vector.hpp" />
     <ClInclude Include="SDK\vector2D.hpp" />
     <ClInclude Include="SDK\VMatrix.hpp" />
+    <ClInclude Include="vars.hpp" />
     <ClInclude Include="xor.hpp" />
   </ItemGroup>
   <ItemGroup>

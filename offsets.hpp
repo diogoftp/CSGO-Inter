@@ -5,8 +5,8 @@ MODULEINFO GetModuleInfo(const char* szModule);
 const char* ScanIn(const char* pattern, const char* mask, const char* begin, unsigned int size);
 ptrdiff_t PatternScan(const char* module, const char* pattern, const char* mask, std::vector<int> offsets, unsigned int extra, bool relative);
 
-namespace offsets {
-	void Initialize();
+namespace Offsets {
+	void Setup();
 	inline uintptr_t dwClient = NULL;
 	inline uintptr_t dwEngine = NULL;
 
@@ -46,5 +46,5 @@ namespace offsets {
 	inline ptrdiff_t dwClientState = NULL;
 	inline ptrdiff_t dwClientState_State = NULL;
 	inline ptrdiff_t dwClientState_ViewAngles = NULL;
-	//inline ptrdiff_t dwGlobalVars = NULL;
+	inline ptrdiff_t dwGlobalVars = NULL;
 }

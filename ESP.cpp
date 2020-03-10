@@ -7,10 +7,10 @@ void ESP(Entity* localPlayer, Entity* target, uintptr_t dwClient, uintptr_t Glow
 
     if (localPlayer != NULL && GlowObjectManager != NULL) {
         //my_team = localPlayer->team;
-        my_team = *(int*)((uintptr_t)localPlayer + offsets::m_iTeamNum);
-        int glowIndex = *(int*)((uintptr_t)target + offsets::m_iGlowIndex);
+        my_team = *(int*)((uintptr_t)localPlayer + Offsets::m_iTeamNum);
+        int glowIndex = *(int*)((uintptr_t)target + Offsets::m_iGlowIndex);
         //ent_team = target->team;
-        ent_team = *(int*)((uintptr_t)target + offsets::m_iTeamNum);
+        ent_team = *(int*)((uintptr_t)target + Offsets::m_iTeamNum);
         if (ent_team == my_team) {
             *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x4)) = 0.f;
             *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x8)) = 0.f;

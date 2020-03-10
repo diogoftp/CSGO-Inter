@@ -8,7 +8,8 @@
 #include "xor.hpp"
 #include "interfaces.hpp"
 #include "offsets.hpp"
-//#include "hooks.hpp"
+#include "hooks.hpp"
+#include "vars.hpp"
 
 #include "gui.hpp"
 #include "ESP.hpp"
@@ -17,79 +18,68 @@
 
 //#define DEBUG1 1
 
-// Data
+//Data
 LPDIRECT3D9              g_pD3D = NULL;
 LPDIRECT3DDEVICE9        g_pd3dDevice = NULL;
 D3DPRESENT_PARAMETERS    g_d3dpp = {};
 
+//Globals
+Globals::myGlobals Vars;
+
 DWORD WINAPI LoopThread(HMODULE hModule) {
-	//GUI Setup
-	RECT desktop;
-	const HWND hDesktop = GetDesktopWindow();
-	GetWindowRect(hDesktop, &desktop);
-	int hsize = desktop.right;
-	int vsize = desktop.bottom;
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, ("HehexDD"), NULL };
-	RegisterClassEx(&wc);
-	HWND hwnd = CreateWindowEx(WS_EX_LAYERED, wc.lpszClassName, wc.lpszClassName, WS_POPUP, 0, 0, hsize, vsize, NULL, NULL, wc.hInstance, NULL);
-	SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 255, LWA_ALPHA | LWA_COLORKEY);
-	MSG msg;
-	ZeroMemory(&msg, sizeof(msg));
-	int teste = guiSetup(hwnd, wc);
-	if (teste != 0) return 1;
-	//End GUI Setup
-
-	//Vars
-	float aimbotFOV = 3.0f;
-	float aimbotSmooth = 4.0f;
-	bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true;
-
-	//Flags
-	bool setForeground = true;
-	bool aimKeyState = false;
-	bool aimKeyPrevState = false;
-	bool targetLock = false;
-	bool clearTarget = true;
-
-	Interfaces::Initialize();
-	offsets::Initialize();
-	
-
-	uintptr_t pLocalPlayer = offsets::dwClient + offsets::dwLocalPlayer;
-	uintptr_t pGlowObjectManager = offsets::dwClient + offsets::dwGlowObjectManager;
-	uintptr_t pEntityList = offsets::dwClient + offsets::dwEntityList;
-	uintptr_t pClientState = offsets::dwEngine + offsets::dwClientState;
-
-	srand((unsigned int)time(0));
-
-	//PRINTS
+	//PRINTS (Console)
 	#ifdef DEBUG1
 	AllocConsole();
 	FILE* f;
 	freopen_s(&f, "CONOUT$", "w", stdout);
 	#endif // DEBUG1
 
-	//if (startHook() != 0) MessageBoxA(0, "ERRO", "ERRO", MB_OK);
+	srand((unsigned int)time(0));
 
+	//Flags
+	bool setForeground = true;
+	bool aimKeyState = false;
+	bool aimKeyPrevState = true;
+	bool targetLock = false;
+	bool clearTarget = true;
+
+	//GUI Setup
+	GUI::GUIStruct GUIProps;
+	if (!GUI::Setup(&GUIProps)) return 1;
+
+	//Utilities Setup
+	Interfaces::Setup();
+	Offsets::Setup();
+	//Hooks::Setup();
+
+	aimbot *Aimbot = new aimbot;
+
+	uintptr_t pLocalPlayer = Offsets::dwClient + Offsets::dwLocalPlayer;
+	uintptr_t pGlowObjectManager = Offsets::dwClient + Offsets::dwGlowObjectManager;
+	uintptr_t pEntityList = Offsets::dwClient + Offsets::dwEntityList;
+	uintptr_t pClientState = Offsets::dwEngine + Offsets::dwClientState;
+	//CGlobalVarsBase* globals = (CGlobalVarsBase*)(Offsets::dwEngine + Offsets::dwGlobalVars);
 	EntList* entityList = (EntList*)pEntityList;
+
 	while (!GetAsyncKeyState(VK_INSERT)) {
 		uintptr_t GlowObjectManager = *(uintptr_t*)pGlowObjectManager;
 		uintptr_t ClientState = *(uintptr_t*)pClientState;
-
-		int GameState = *(uintptr_t*)(ClientState + offsets::dwClientState_State);
-
-		Vec3* viewAngles = (Vec3*)(ClientState + offsets::dwClientState_ViewAngles);
-
+		int GameState = *(uintptr_t*)(ClientState + Offsets::dwClientState_State);
+		Vec3* viewAngles = (Vec3*)(ClientState + Offsets::dwClientState_ViewAngles);
 		Entity* localPlayer = (Entity*)(*(uintptr_t*)pLocalPlayer);
 
 		//PRINTS
 		#ifdef DEBUG1
 		system("cls");
-		std::cout << "FOV: " << aimbotFOV << std::endl << "Smooth: " << aimbotSmooth << std::endl;
-		std::cout << "[HOME]bRadar: " << bRadar << std::endl;
-		std::cout << "[DELETE]bESP: " << bESP << std::endl;
+		//std::cout << "FPS: " << 1.0f / globals->frametime << std::endl;
+		std::cout << "FOV: " << Vars.aimbotFOV << std::endl;
+		std::cout << "Smooth: " << Vars.aimbotSmooth << std::endl;
+		std::cout << "Radar: " << Vars.bRadar << std::endl;
+		std::cout << "ESP: " << Vars.bESP << std::endl;
+		std::cout << "[DELETE]Open GUI" << std::endl;
 		std::cout << "[INSERT]Desligar" << std::endl;
 		std::cout << "GameState: " << GameState << std::endl;
+		//std::cout << "TL: " << targetLock << std::endl << "CT: " << clearTarget << std::endl;
 		if (localPlayer && GameState == 6) std::cout << "LocalPlayer: ID: " << localPlayer->clientId() << " Health: " << localPlayer->health() << std::endl;
 		for (int i = 0; i < 32; i++) {
 			if (entityList->entityListObjs[i].entity != NULL) {
@@ -105,28 +95,28 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		#endif // DEBUG1
 
 		//Draw GUI
-		if (bMenu) {
-			UpdateWindow(hwnd);
-			ShowWindow(hwnd, SW_RESTORE);
+		if (Vars.bMenu) {
+			UpdateWindow(GUIProps.hwnd);
+			ShowWindow(GUIProps.hwnd, SW_RESTORE);
 			if (setForeground) {
-				SetForegroundWindow(hwnd);
+				SetForegroundWindow(GUIProps.hwnd);
 				setForeground = false;
 			}
-			windowLoop(hwnd, msg, hsize, vsize, &bESP, &bRadar, &aimbotFOV, &aimbotSmooth, &bRCSAimbot);
+			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, GUIProps.hsize, GUIProps.vsize, &Vars.bESP, &Vars.bRadar, &Vars.aimbotFOV, &Vars.aimbotSmooth, &Vars.bRCSAimbot);
 		}
 		else {
-			ShowWindow(hwnd, SW_HIDE);
+			ShowWindow(GUIProps.hwnd, SW_HIDE);
 			setForeground = true;
 		}
 		//End Draw GUI
 
 		//Menu toggle
 		if (GetAsyncKeyState(VK_DELETE) & 1) {
-			bMenu = !bMenu;
+			Vars.bMenu = !Vars.bMenu;
 		}
 
-		//Check if needs to change target
-		aimKeyState = (GetKeyState(VK_XBUTTON1) & 0x100) != 0;
+		//Check if needs to change aimbot target
+		aimKeyState = (GetAsyncKeyState(VK_XBUTTON1)) != 0;
 		if (aimKeyPrevState != aimKeyState) {
 			if (aimKeyState) {
 				targetLock = true;
@@ -140,27 +130,27 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		//Aimbot
 		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6) {
-			if (aimbotSmooth == 0) {
-				rageAimbot(localPlayer, entityList, viewAngles, aimbotFOV, bRCSAimbot);
+			if (Vars.aimbotSmooth == 0) {
+				Aimbot->rageAimbot(localPlayer, entityList, viewAngles, Vars.aimbotFOV, Vars.bRCSAimbot);
 			}
 			else {
-				aimbotbyFOV(localPlayer, entityList, viewAngles, aimbotFOV, aimbotSmooth, clearTarget, bRCSAimbot);
+				Aimbot->aimbotbyFOV(localPlayer, entityList, viewAngles, Vars.aimbotFOV, Vars.aimbotSmooth, clearTarget, Vars.bRCSAimbot);
 			}
 			if (clearTarget == true) clearTarget = false;
 		}
 
 		//Standalone RCS
 		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6) {
-			RCS(localPlayer, viewAngles);
+			Aimbot->RCS(localPlayer, viewAngles);
 		}
 
 		//TRay
 		if (GetAsyncKeyState(VK_END) && GameState == 6) {
-			std::cout << "Inter: " << g_EngineTrace << std::endl;
+			std::cout << "Inter: " << Interfaces::g_EngineTrace << std::endl;
 			for (unsigned short int i = 0; i < 32; i++) {
 				if (entityList->entityListObjs[i].entity != NULL) {
 					if (entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
-						if (isVisible(localPlayer, entityList->entityListObjs[i].entity)) {
+						if (Aimbot->isVisible(localPlayer, entityList->entityListObjs[i].entity)) {
 							std::cout << "Visible: " << entityList->entityListObjs[i].entity->clientId() << std::endl;
 						}
 					}
@@ -169,24 +159,21 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		}
 
 		//Radar and ESP
-		if ((bRadar || bESP) && GameState == 6) {
+		if ((Vars.bRadar || Vars.bESP) && GameState == 6) {
 			for (unsigned short int i = 0; i < 32; i++) {
 				if (entityList->entityListObjs[i].entity != NULL) {
 					if (entityList->entityListObjs[i].entity->dormant()) continue;
-					if (bRadar) Radar(entityList->entityListObjs[i].entity);
-					if (bESP) ESP(localPlayer, entityList->entityListObjs[i].entity, offsets::dwClient, GlowObjectManager);
+					if (Vars.bRadar) Radar(entityList->entityListObjs[i].entity);
+					if (Vars.bESP) ESP(localPlayer, entityList->entityListObjs[i].entity, Offsets::dwClient, GlowObjectManager);
 				}
 			}
 		}
 
-		/*if (GetAsyncKeyState(VK_END)) {
-			endHook();
-		}*/
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
 
-	//endHook();
-	guiEnd(hwnd, wc);
+	//Hooks::Shutdown();
+	GUI::Shutdown(GUIProps.hwnd, GUIProps.wc);
 
 	//PRINTS
 	#ifdef DEBUG1
@@ -202,7 +189,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, uintptr_t ul_reason_for_call, LPVOID lpRe
 	switch (ul_reason_for_call)	{
 	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
-		//CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)LoopThread, hModule, 0, nullptr));
 		if (auto handle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)LoopThread, hModule, 0, nullptr)) {
 			CloseHandle(handle);
 		}
