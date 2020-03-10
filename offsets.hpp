@@ -31,9 +31,6 @@ namespace Offsets {
 	//DT_BaseAnimating
 	inline ptrdiff_t m_dwBoneMatrix = NULL;
 
-	//DT_MaterialModifyControl
-	//inline ptrdiff_t m_flFramerate = NULL;
-
 	//Signatures
 	//client_panorama.dll
 	inline ptrdiff_t m_bDormant = NULL;
@@ -46,5 +43,7 @@ namespace Offsets {
 	inline ptrdiff_t dwClientState = NULL;
 	inline ptrdiff_t dwClientState_State = NULL;
 	inline ptrdiff_t dwClientState_ViewAngles = NULL;
-	inline ptrdiff_t dwGlobalVars = NULL;
+	//inline ptrdiff_t dwGlobalVars = NULL;
+	//inline ptrdiff_t dwGameDir = NULL;
+	//inline ptrdiff_t dwClientState_MapDirectory = NULL;
 }

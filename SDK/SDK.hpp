@@ -23,12 +23,28 @@ public:
 	Vec3 origin() {
 		return *(Vec3*)((uintptr_t)this + Offsets::m_vecOrigin);
 	}
-
 	int8_t lifeState() {
 		return *(int8_t*)((uintptr_t)this + Offsets::m_lifeState);
 	}
 	Vec3 viewOffset() {
 		return *(Vec3*)((uintptr_t)this + Offsets::m_vecViewOffset);
+	}
+	int8_t glowIndex() {
+		return *(int8_t*)((uintptr_t)this + Offsets::m_iGlowIndex);
+	}
+	int8_t shotsFired() {
+		return *(int8_t*)((uintptr_t)this + Offsets::m_iShotsFired);
+	}
+	Vec3 aimPunchAngle() {
+		return *(Vec3*)((uintptr_t)this + Offsets::m_aimPunchAngle);
+	}
+	Vec3 getBonePos(int bone) {
+		uintptr_t BoneBase = *(uintptr_t*)(this + Offsets::m_dwBoneMatrix);
+		Vec3 bones;
+		bones.x = *(float*)(BoneBase + 0x30 * bone + 0x0C);
+		bones.y = *(float*)(BoneBase + 0x30 * bone + 0x1C);
+		bones.z = *(float*)(BoneBase + 0x30 * bone + 0x2C);
+		return bones;
 	}
 };
 

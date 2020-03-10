@@ -1,12 +1,6 @@
 #include "aimbot.hpp"
 #include "offsets.hpp"
-#include "interfaces.hpp"
 #include <iostream>
-
-tTraceRay TraceRay;
-
-Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
-Entity* aimTarget = nullptr;
 
 aimbot::aimbot() {
 
@@ -65,7 +59,7 @@ bool aimbot::isVisible(Entity* localPlayer, Entity* target) {
 	CGameTrace trace;
 
 	Vec3 me = localPlayer->origin() + localPlayer->viewOffset();
-	Vec3 en = getBonePos(target, 7);
+	Vec3 en = target->getBonePos(7);
 
 	tracefilter.pSkip = (void*)localPlayer;
 	ray.Init(me, en);
@@ -77,15 +71,6 @@ bool aimbot::isVisible(Entity* localPlayer, Entity* target) {
 	else {
 		return false;
 	}
-}
-
-Vec3 aimbot::getBonePos(Entity* target, int bone) {
-	uintptr_t BoneBase = *(uintptr_t*)(target + Offsets::m_dwBoneMatrix);
-	Vec3 bones;
-	bones.x = *(float*)(BoneBase + 0x30 * bone + 0x0C);
-	bones.y = *(float*)(BoneBase + 0x30 * bone + 0x1C);
-	bones.z = *(float*)(BoneBase + 0x30 * bone + 0x2C);
-	return bones;
 }
 
 void aimbot::rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot) {
@@ -125,7 +110,7 @@ void aimbot::aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAng
 	float aimbotSmoothRandRCS = 1.0f;
 	float RCSSmoothRand = 0.1f;
 	float dynFOV = 0.0f;
-	dynFOV = *(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) * 0.5f;
+	dynFOV = localPlayer->shotsFired() * 0.5f;
 	Vec3 myAngle = *viewAngles;
 	
 	//Clear target lock
@@ -140,10 +125,8 @@ void aimbot::aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAng
 		if (target.y > 180) target.y -= 360;
 		if (target.y < -180) target.y += 360;
 		if (abs(target.x) <= (aimbotFOV + dynFOV) && abs(target.y) <= (aimbotFOV + dynFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0 && aimbotSmooth > 0) {
-			if (bRCSAimbot && *(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) > 3) {
-				Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + Offsets::m_aimPunchAngle);
-				currentPunch.x *= 2.0f;
-				currentPunch.y *= 2.0f;
+			if (bRCSAimbot && localPlayer->shotsFired() > 2) {
+				Vec3 currentPunch = localPlayer->aimPunchAngle() * 2;
 				myAngle.x += (target.x - (currentPunch.x + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand))) / (aimbotSmooth + RandomFloat(0, aimbotSmoothRandRCS));
 				myAngle.y += (target.y - (currentPunch.y + RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand))) / (aimbotSmooth + RandomFloat(0, aimbotSmoothRandRCS));
 				myAngle.x += RandomFloat(-1 * aimbotOver, aimbotOver);
@@ -171,8 +154,8 @@ Entity* aimbot::getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entity
 	Entity* targetEnt = nullptr;
 
 	for (unsigned short int i = 0; i < 32; i++) {
-		if (entityList->entityListObjs[i].entity && isSpotted(localPlayer, entityList->entityListObjs[i].entity) && entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->lifeState() == 0 && entityList->entityListObjs[i].entity->health() > 0 && entityList->entityListObjs[i].entity->team() != localPlayer->team() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
-			Vec3 bones = getBonePos(entityList->entityListObjs[i].entity, 7);
+		if (entityList->entityListObjs[i].entity && isVisible(localPlayer, entityList->entityListObjs[i].entity) && entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->lifeState() == 0 && entityList->entityListObjs[i].entity->health() > 0 && entityList->entityListObjs[i].entity->team() != localPlayer->team() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
+			Vec3 bones = entityList->entityListObjs[i].entity->getBonePos(7);
 			Vec3 lpView = localPlayer->viewOffset();
 			Vec3 myeyes = localPlayer->origin() + lpView;
 			Vec3 aimDest = calcAngle3D(myeyes, bones);
@@ -194,8 +177,8 @@ Entity* aimbot::getTarget(Entity* localPlayer, Vec3* viewAngles, EntList* entity
 
 Vec3 aimbot::calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
 	Vec3 target;
-	if (targetEnt && isSpotted(localPlayer, targetEnt) && targetEnt->clientId() != localPlayer->clientId() && targetEnt->lifeState() == 0 && targetEnt->health() > 0 && targetEnt->team() != localPlayer->team() && targetEnt->dormant() != TRUE) {
-		Vec3 bones = getBonePos(targetEnt, 7);
+	if (targetEnt && isVisible(localPlayer, targetEnt) && targetEnt->clientId() != localPlayer->clientId() && targetEnt->lifeState() == 0 && targetEnt->health() > 0 && targetEnt->team() != localPlayer->team() && targetEnt->dormant() != TRUE) {
+		Vec3 bones = targetEnt->getBonePos(7);
 		Vec3 lpView = localPlayer->viewOffset();
 		Vec3 myeyes = localPlayer->origin() + lpView;
 		Vec3 aimDest = calcAngle3D(myeyes, bones);
@@ -209,14 +192,12 @@ Vec3 aimbot::calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt
 }
 
 void aimbot::RCS(Entity* localPlayer, Vec3* viewAngles) {
-	if (*(int*)((uintptr_t)localPlayer + Offsets::m_iShotsFired) > 1) {
-		float RCSSmoothRand = 0.1f;
-		Vec3 currentPunch = *(Vec3*)((uintptr_t)localPlayer + Offsets::m_aimPunchAngle);
-		currentPunch.x = currentPunch.x * 2;
-		currentPunch.y = currentPunch.y * 2;
+	if (localPlayer->shotsFired() > 1) {
+		float RCSSmooth = 0.1f;
+		Vec3 currentPunch = localPlayer->aimPunchAngle() * 2;
 		Vec3 myAngle = *viewAngles + oldAngle - currentPunch;
-		myAngle.x += RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
-		myAngle.y += RandomFloat(-1 * RCSSmoothRand, RCSSmoothRand);
+		myAngle.x += RandomFloat(-1 * RCSSmooth, RCSSmooth);
+		myAngle.y += RandomFloat(-1 * RCSSmooth, RCSSmooth);
 		normalize(myAngle);
 		clamp(myAngle);
 		viewAngles->x = myAngle.x;

@@ -2,9 +2,14 @@
 #include <thread>
 #include <chrono>
 #include "SDK/SDK.hpp"
+#include "interfaces.hpp"
 
 class aimbot {
+private:
 	const float pi = 3.14159265358979323846f;
+	tTraceRay TraceRay;
+	Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
+	Entity* aimTarget = nullptr;
 public:
 	aimbot();
 	~aimbot();
@@ -16,7 +21,6 @@ public:
 
 	bool isSpotted(Entity* localPlayer, Entity* target);
 	bool isVisible(Entity* localPlayer, Entity* target);
-	Vec3 getBonePos(Entity* target, int bone);
 
 	void rageAimbot(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, bool bRCSAimbot);
 	void aimbotbyFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot);

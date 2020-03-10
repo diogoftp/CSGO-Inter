@@ -92,7 +92,9 @@ namespace Offsets {
 		dwClientState = PatternScan(enginedllSTR, "\xA1\x00\x00\x00\x00\x33\xD2\x6A\x00\x6A\x00\x33\xC9\x89\xB0", "x????xxxxxxxxxx", { 1 }, 0, true);
 		dwClientState_State = PatternScan(enginedllSTR, "\x83\xB8\x00\x00\x00\x00\x00\x0F\x94\xC0\xC3", "xx?????xxxx", { 2 }, 0, false);
 		dwClientState_ViewAngles = PatternScan(enginedllSTR, "\xF3\x0F\x11\x80\x00\x00\x00\x00\xD9\x46\x04\xD9\x05", "xxxx????xxxxx", { 4 }, 0, false);
-		dwGlobalVars = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xFF\x50\x08\x85\xC0", "x????x????xxxxx", { 1 }, 0, true);
+		//dwGlobalVars = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xFF\x50\x08\x85\xC0", "x????x????xxxxx", { 1 }, 0, true);
+		//dwGameDir = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x8D\x85\x00\x00\x00\x00\x50\x68\x00\x00\x00\x00\x68", "x????xx????xx????x", { 1 }, 0, true);
+		//dwClientState_MapDirectory = PatternScan(enginedllSTR, "\xB8\x00\x00\x00\x00\xC3\x05\x00\x00\x00\x00\xC3", "x????xx????x", { 7 }, 0, false);
 
 		//Netvars
 		//DT_BasePlayer
@@ -116,11 +118,6 @@ namespace Offsets {
 		m_bSpottedByMask = Interfaces::GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedByMaskSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 
 		//DT_BaseAnimating
-		m_dwBoneMatrix = Interfaces::GetNetVarOffset(DT_BaseAnimatingSTR, m_nForceBoneSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses)) + 28;
-
-		//DT_MaterialModifyControl
-		//m_flFramerate = Interfaces::GetNetVarOffset(DT_MaterialModifyControlSTR, m_flFramerateSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
-
-		
+		m_dwBoneMatrix = Interfaces::GetNetVarOffset(DT_BaseAnimatingSTR, m_nForceBoneSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses)) + 28;		
 	}
 }

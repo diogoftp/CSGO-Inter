@@ -54,19 +54,20 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 	aimbot *Aimbot = new aimbot;
 
-	uintptr_t pLocalPlayer = Offsets::dwClient + Offsets::dwLocalPlayer;
-	uintptr_t pGlowObjectManager = Offsets::dwClient + Offsets::dwGlowObjectManager;
-	uintptr_t pEntityList = Offsets::dwClient + Offsets::dwEntityList;
-	uintptr_t pClientState = Offsets::dwEngine + Offsets::dwClientState;
 	//CGlobalVarsBase* globals = (CGlobalVarsBase*)(Offsets::dwEngine + Offsets::dwGlobalVars);
-	EntList* entityList = (EntList*)pEntityList;
+	EntList* entityList = (EntList*)(Offsets::dwClient + Offsets::dwEntityList);
+	uintptr_t GlowObjectManager = *(uintptr_t*)(Offsets::dwClient + Offsets::dwGlowObjectManager);
+
+	//Multi-thread bug fix for raytrace
+	typedef void(__cdecl* _allocateThread)();
+	_allocateThread FixRay = (_allocateThread)GetProcAddress(GetModuleHandleA("tier0.dll"), "AllocateThreadID");
+	FixRay();
 
 	while (!GetAsyncKeyState(VK_INSERT)) {
-		uintptr_t GlowObjectManager = *(uintptr_t*)pGlowObjectManager;
-		uintptr_t ClientState = *(uintptr_t*)pClientState;
+		uintptr_t ClientState = *(uintptr_t*)(Offsets::dwEngine + Offsets::dwClientState);
 		int GameState = *(uintptr_t*)(ClientState + Offsets::dwClientState_State);
 		Vec3* viewAngles = (Vec3*)(ClientState + Offsets::dwClientState_ViewAngles);
-		Entity* localPlayer = (Entity*)(*(uintptr_t*)pLocalPlayer);
+		Entity* localPlayer = (Entity*)(*(uintptr_t*)(Offsets::dwClient + Offsets::dwLocalPlayer));
 
 		//PRINTS
 		#ifdef DEBUG1
@@ -79,7 +80,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		std::cout << "[DELETE]Open GUI" << std::endl;
 		std::cout << "[INSERT]Desligar" << std::endl;
 		std::cout << "GameState: " << GameState << std::endl;
-		//std::cout << "TL: " << targetLock << std::endl << "CT: " << clearTarget << std::endl;
 		if (localPlayer && GameState == 6) std::cout << "LocalPlayer: ID: " << localPlayer->clientId() << " Health: " << localPlayer->health() << std::endl;
 		for (int i = 0; i < 32; i++) {
 			if (entityList->entityListObjs[i].entity != NULL) {
@@ -144,28 +144,14 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 			Aimbot->RCS(localPlayer, viewAngles);
 		}
 
-		//TRay
-		if (GetAsyncKeyState(VK_END) && GameState == 6) {
-			std::cout << "Inter: " << Interfaces::g_EngineTrace << std::endl;
-			for (unsigned short int i = 0; i < 32; i++) {
-				if (entityList->entityListObjs[i].entity != NULL) {
-					if (entityList->entityListObjs[i].entity->clientId() != localPlayer->clientId() && entityList->entityListObjs[i].entity->dormant() != TRUE) {
-						if (Aimbot->isVisible(localPlayer, entityList->entityListObjs[i].entity)) {
-							std::cout << "Visible: " << entityList->entityListObjs[i].entity->clientId() << std::endl;
-						}
-					}
-				}
-			}
-		}
-
 		//Radar and ESP
 		if ((Vars.bRadar || Vars.bESP) && GameState == 6) {
 			for (unsigned short int i = 0; i < 32; i++) {
-				if (entityList->entityListObjs[i].entity != NULL) {
-					if (entityList->entityListObjs[i].entity->dormant()) continue;
-					if (Vars.bRadar) Radar(entityList->entityListObjs[i].entity);
-					if (Vars.bESP) ESP(localPlayer, entityList->entityListObjs[i].entity, Offsets::dwClient, GlowObjectManager);
-				}
+				if (entityList->entityListObjs[i].entity == NULL) continue;
+				Entity* entity = entityList->entityListObjs[i].entity;
+				if (entity->dormant() || entity->lifeState() != 0 || entity->health() < 1) continue;
+				if (Vars.bRadar && entity->team() != localPlayer->team()) Radar(entity);
+				if (Vars.bESP) ESP(localPlayer, entity, GlowObjectManager);
 			}
 		}
 
@@ -180,6 +166,11 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	if(f != NULL) fclose(f);
 	FreeConsole();
 	#endif // DEBUG1
+
+	//Multi-thread bug fix for raytrace
+	typedef void(__cdecl* _freeThread)();
+	_freeThread freeFixRay = (_freeThread)GetProcAddress(GetModuleHandleA("tier0.dll"), "FreeThreadID");
+	freeFixRay();
 
 	FreeLibraryAndExitThread(hModule, 0);
 	return 0;
