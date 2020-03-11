@@ -1,8 +1,5 @@
 #pragma once
-#include <thread>
-#include <chrono>
 #include "SDK/SDK.hpp"
-#include "interfaces.hpp"
 
 class aimbot {
 public:
@@ -27,14 +24,14 @@ public:
 
 	//bool isSpotted(Entity* localPlayer, Entity* target);
 	bool isVisible(Entity* localPlayer, Entity* target);
+	bool smokeCheck(Vec3 src, Vec3 dst);
 	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot);
 	void doAimbot(Entity* localPlayer, Vec3* viewangles, Vec3 targetPoint, float aimbotSmooth, bool bRCSAimbot);
 	void doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV, bool bRCSAimbot);
-	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt);
+	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt, int boneIndex);
 	void RCS(Entity* localPlayer, Vec3* viewAngles);
 private:
 	const float pi = 3.14159265358979323846f;
-	tTraceRay TraceRay;
 	Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
 	Entity* aimTarget = nullptr;
 	std::vector<TList> targetList;

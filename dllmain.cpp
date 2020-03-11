@@ -1,5 +1,3 @@
-#include <iostream>
-	
 #include <time.h>
 #include <thread>
 #include <chrono>
@@ -17,6 +15,11 @@
 #include "aimbot.hpp"
 
 //#define DEBUG1 1
+
+//PRINTS (Console)
+#ifdef DEBUG1
+#include <iostream>
+#endif // DEBUG1
 
 #define CONOUT$STR Decrypt({ 0xa, 0x6, 0x7, 0x6, 0x1c, 0x1d, 0x6d }).c_str()
 #define wSTR Decrypt({ 0x3e }).c_str()
@@ -79,6 +82,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		#ifdef DEBUG1
 		system("cls");
 		//std::cout << "FPS: " << 1.0f / globals->frametime << std::endl;
+		std::cout << "ADD: " << Offsets::LineGoesThroughSmoke << std::endl;;
 		std::cout << "FOV: " << Vars.aimbotFOV << std::endl;
 		std::cout << "Smooth: " << Vars.aimbotSmooth << std::endl;
 		std::cout << "Radar: " << Vars.bRadar << std::endl;
@@ -90,7 +94,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		for (int i = 0; i < 32; i++) {
 			if (entityList->entityListObjs[i].entity != NULL) {
 				Entity* ent = entityList->entityListObjs[i].entity;
-				std::cout << "ID: " << ent->clientId() << " Index: " << i << " Health: " << ent->health() <<  " LifeState: " << ent->lifeState() << std::endl;
+				std::cout << "ID: " << ent->clientId() << " Index: " << i << " Health: " << ent->health() << std::endl;
 			}
 		}
 		/*if (g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer()) != NULL && GameState == 6) std::cout << "LocalPlayer: ID: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->clientId() << " Health: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->health() << std::endl;

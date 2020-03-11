@@ -87,6 +87,7 @@ namespace Offsets {
 		dwGlowObjectManager = PatternScan(client_panoramadllSTR, "\xA1\x00\x00\x00\x00\xA8\x01\x75\x4B", "x????xxxx", { 1 }, 4, true);
 		dwEntityList = PatternScan(client_panoramadllSTR, "\xBB\x00\x00\x00\x00\x83\xFF\x01\x0F\x8C\x00\x00\x00\x00\x3B\xF8", "x????xxxxx????xx", { 1 }, 0, true);
 		dwGetAllClasses = PatternScan(client_panoramadllSTR, "\xA1\x00\x00\x00\x00\xC3\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xA1\x00\x00\x00\x00\xB9", "x????xxxxxxxxxxxx????x", { 1, 0 }, 0, true);
+		LineGoesThroughSmoke = PatternScan(client_panoramadllSTR, "\x55\x8B\xEC\x83\xEC\x08\x8B\x15\x00\x00\x00\x00\x0F\x57\xC0", "xxxxxxxx????xxx", { }, 0, false); //Func
 
 		//engine.dll
 		dwClientState = PatternScan(enginedllSTR, "\xA1\x00\x00\x00\x00\x33\xD2\x6A\x00\x6A\x00\x33\xC9\x89\xB0", "x????xxxxxxxxxx", { 1 }, 0, true);

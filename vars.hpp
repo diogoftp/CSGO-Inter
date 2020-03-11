@@ -1,5 +1,4 @@
 #pragma once
-
 namespace Globals {
 	struct myGlobals {
 		float aimbotFOV = 3.0f;

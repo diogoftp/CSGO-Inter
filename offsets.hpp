@@ -38,6 +38,7 @@ namespace Offsets {
 	inline ptrdiff_t dwGlowObjectManager = NULL;
 	inline ptrdiff_t dwEntityList = NULL;
 	inline ptrdiff_t dwGetAllClasses = NULL;
+	inline ptrdiff_t LineGoesThroughSmoke = NULL; //Func
 
 	//engine.dll
 	inline ptrdiff_t dwClientState = NULL;

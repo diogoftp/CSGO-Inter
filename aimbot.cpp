@@ -1,6 +1,7 @@
 #include "aimbot.hpp"
-#include "offsets.hpp"
-#include <iostream>
+#include "interfaces.hpp"
+#include <thread>
+#include <chrono>
 #include <algorithm>
 #include <vector>
 
@@ -55,6 +56,12 @@ float aimbot::RandomFloat(float min, float max) {
 	return (bool)(mask & (1 << (localPlayer->clientId() - 1)));
 }*/
 
+bool aimbot::smokeCheck(Vec3 src, Vec3 dst) {
+	typedef bool(__cdecl* td_LineGoesThroughSmoke)(Vec3, Vec3);
+	static td_LineGoesThroughSmoke LineGoesThroughSmoke = (td_LineGoesThroughSmoke)Offsets::LineGoesThroughSmoke;
+	return !LineGoesThroughSmoke(src, dst);
+}
+
 bool aimbot::isVisible(Entity* localPlayer, Entity* target) {
 	CTraceFilter tracefilter;
 	Ray_t ray;
@@ -67,7 +74,7 @@ bool aimbot::isVisible(Entity* localPlayer, Entity* target) {
 	ray.Init(me, en);
 	
 	Interfaces::g_EngineTrace->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &tracefilter, &trace);
-	if (target == trace.hit_entity) {
+	if (target == trace.hit_entity && smokeCheck(me, en)) {
 		return true;
 	}
 	else {
@@ -91,7 +98,7 @@ void aimbot::aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngle
 			if (entityList->entityListObjs[i].entity == NULL) continue;
 			Entity* target = entityList->entityListObjs[i].entity;
 			if (target->dormant() || target->lifeState() != 0 || target->health() < 1 || target->team() == localPlayer->team()) continue;
-			float dist = abs(mag3D(calcTarget(localPlayer, viewAngles, target)));
+			float dist = abs(mag3D(calcTarget(localPlayer, viewAngles, target, 7)));
 			if (dist <= aimbotFOV) {
 				TList potentialTarget(target, dist);
 				targetList.push_back(potentialTarget);
@@ -107,7 +114,7 @@ void aimbot::aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngle
 	if (aimTarget) {
 		float dynFOV = 0.0f;
 		dynFOV = localPlayer->shotsFired() * 0.5f;
-		Vec3 targetPoint = calcTarget(localPlayer, viewAngles, aimTarget);
+		Vec3 targetPoint = calcTarget(localPlayer, viewAngles, aimTarget, 7);
 		if (targetPoint.y > 180) targetPoint.y -= 360;
 		if (targetPoint.y < -180) targetPoint.y += 360;
 
@@ -153,7 +160,7 @@ void aimbot::doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entity
 		if (entityList->entityListObjs[i].entity == NULL) continue;
 		Entity* target = entityList->entityListObjs[i].entity;
 		if (target->dormant() || target->lifeState() != 0 || target->health() < 1 || target->team() == localPlayer->team()) continue;
-		float dist = abs(mag3D(calcTarget(localPlayer, viewAngles, target)));
+		float dist = abs(mag3D(calcTarget(localPlayer, viewAngles, target, 8)));
 		if (dist <= aimbotFOV) {
 			TList potentialTarget(target, dist);
 			targetList.push_back(potentialTarget);
@@ -168,14 +175,14 @@ void aimbot::doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entity
 	if (aimTarget) {
 		float dynFOV = 0.0f;
 		dynFOV = localPlayer->shotsFired() * 0.5f;
-		Vec3 targetPoint = calcTarget(localPlayer, viewAngles, aimTarget);
+		Vec3 targetPoint = calcTarget(localPlayer, viewAngles, aimTarget, 8);
 		if (targetPoint.y > 180) targetPoint.y -= 360;
 		if (targetPoint.y < -180) targetPoint.y += 360;
 
 		if (aimTarget->dormant() == 0 && aimTarget->lifeState() == 0 && aimTarget->health() > 1 && abs(mag3D(targetPoint)) <= (aimbotFOV + dynFOV) && aimbotFOV > 0) {
 			if (isVisible(localPlayer, aimTarget)) {
 				Vec3 myAngle = *viewAngles;
-				Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
+				Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget, 8);
 				if (target.y > 180) target.y -= 360;
 				if (target.y < -180) target.y += 360;
 				if (abs(target.x) <= (aimbotFOV) && abs(target.y) <= (aimbotFOV) && target.x != 0 && target.y != 0 && aimbotFOV > 0) {
@@ -202,8 +209,8 @@ void aimbot::doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entity
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-Vec3 aimbot::calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
-	Vec3 bones = targetEnt->getBonePos(7);
+Vec3 aimbot::calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt, int boneIndex) {
+	Vec3 bones = targetEnt->getBonePos(boneIndex);
 	Vec3 myeyes = localPlayer->origin() + localPlayer->viewOffset();
 	Vec3 aimDest = calcAngle3D(myeyes, bones);
 

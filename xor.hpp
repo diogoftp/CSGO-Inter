@@ -2,4 +2,3 @@
 #include <string>
 
 std::string Decrypt(std::string toEncrypt);
-void printashex(char* toprint);

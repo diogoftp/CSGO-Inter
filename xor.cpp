@@ -1,4 +1,3 @@
-#include <iostream>
 #include "xor.hpp"
 
 std::string Decrypt(std::string toEncrypt) {

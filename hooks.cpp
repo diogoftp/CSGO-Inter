@@ -1,11 +1,5 @@
 #include "hooks.hpp"
-#include <iostream>
-#include <ctime>
-#include "aimbot.hpp"
-#include "interfaces.hpp"
-#include "SDK/IClientMode.hpp"
-
-
+//#include <iostream>
 
 namespace Hooks {
 	typedef HRESULT(APIENTRY* tEndScene)(LPDIRECT3DDEVICE9 pDevice);

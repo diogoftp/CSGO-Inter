@@ -2,10 +2,6 @@
 #include <Windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "vars.hpp"
-#include "interfaces.hpp"
-
-extern Globals::myGlobals Vars;
 
 namespace Hooks {
 	void Setup();
