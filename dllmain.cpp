@@ -8,7 +8,7 @@
 #include "xor.hpp"
 #include "interfaces.hpp"
 #include "offsets.hpp"
-#include "hooks.hpp"
+//#include "hooks.hpp"
 #include "vars.hpp"
 
 #include "gui.hpp"
@@ -17,6 +17,12 @@
 #include "aimbot.hpp"
 
 //#define DEBUG1 1
+
+#define CONOUT$STR Decrypt({ 0xa, 0x6, 0x7, 0x6, 0x1c, 0x1d, 0x6d }).c_str()
+#define wSTR Decrypt({ 0x3e }).c_str()
+#define tier0STR Decrypt({ 0x3d, 0x20, 0x2c, 0x3b, 0x79, 0x67, 0x2d, 0x25, 0x25 }).c_str()
+#define AllocateThreadIDSTR Decrypt({ 0x8, 0x25, 0x25, 0x26, 0x2a, 0x28, 0x3d, 0x2c, 0x1d, 0x21, 0x3b, 0x2c, 0x28, 0x2d, 0x0, 0xd }).c_str()
+#define FreeThreadIDSTR Decrypt({ 0xf, 0x3b, 0x2c, 0x2c, 0x1d, 0x21, 0x3b, 0x2c, 0x28, 0x2d, 0x0, 0xd }).c_str()
 
 //Data
 LPDIRECT3D9              g_pD3D = NULL;
@@ -27,11 +33,16 @@ D3DPRESENT_PARAMETERS    g_d3dpp = {};
 Globals::myGlobals Vars;
 
 DWORD WINAPI LoopThread(HMODULE hModule) {
+	//Multi-thread bug fix for raytrace
+	typedef void(__cdecl* _allocateThread)();
+	_allocateThread FixRay = (_allocateThread)GetProcAddress(GetModuleHandleA(tier0STR), AllocateThreadIDSTR);
+	FixRay();
+
 	//PRINTS (Console)
 	#ifdef DEBUG1
 	AllocConsole();
 	FILE* f;
-	freopen_s(&f, "CONOUT$", "w", stdout);
+	freopen_s(&f, CONOUT$STR, wSTR, stdout);
 	#endif // DEBUG1
 
 	srand((unsigned int)time(0));
@@ -56,18 +67,13 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 	//CGlobalVarsBase* globals = (CGlobalVarsBase*)(Offsets::dwEngine + Offsets::dwGlobalVars);
 	EntList* entityList = (EntList*)(Offsets::dwClient + Offsets::dwEntityList);
-	uintptr_t GlowObjectManager = *(uintptr_t*)(Offsets::dwClient + Offsets::dwGlowObjectManager);
-
-	//Multi-thread bug fix for raytrace
-	typedef void(__cdecl* _allocateThread)();
-	_allocateThread FixRay = (_allocateThread)GetProcAddress(GetModuleHandleA("tier0.dll"), "AllocateThreadID");
-	FixRay();
 
 	while (!GetAsyncKeyState(VK_INSERT)) {
 		uintptr_t ClientState = *(uintptr_t*)(Offsets::dwEngine + Offsets::dwClientState);
 		int GameState = *(uintptr_t*)(ClientState + Offsets::dwClientState_State);
 		Vec3* viewAngles = (Vec3*)(ClientState + Offsets::dwClientState_ViewAngles);
 		Entity* localPlayer = (Entity*)(*(uintptr_t*)(Offsets::dwClient + Offsets::dwLocalPlayer));
+		uintptr_t GlowObjectManager = *(uintptr_t*)(Offsets::dwClient + Offsets::dwGlowObjectManager);
 
 		//PRINTS
 		#ifdef DEBUG1
@@ -83,7 +89,8 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		if (localPlayer && GameState == 6) std::cout << "LocalPlayer: ID: " << localPlayer->clientId() << " Health: " << localPlayer->health() << std::endl;
 		for (int i = 0; i < 32; i++) {
 			if (entityList->entityListObjs[i].entity != NULL) {
-				std::cout << "ID: " << entityList->entityListObjs[i].entity->clientId() << " Health: " << entityList->entityListObjs[i].entity->health() << " Index: " << i << std::endl;
+				Entity* ent = entityList->entityListObjs[i].entity;
+				std::cout << "ID: " << ent->clientId() << " Index: " << i << " Health: " << ent->health() <<  " LifeState: " << ent->lifeState() << std::endl;
 			}
 		}
 		/*if (g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer()) != NULL && GameState == 6) std::cout << "LocalPlayer: ID: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->clientId() << " Health: " << g_EntityList->GetClientEntity(g_EngineClient->GetLocalPlayer())->health() << std::endl;
@@ -129,29 +136,24 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		}
 
 		//Aimbot
-		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6) {
-			if (Vars.aimbotSmooth == 0) {
-				Aimbot->rageAimbot(localPlayer, entityList, viewAngles, Vars.aimbotFOV, Vars.bRCSAimbot);
-			}
-			else {
-				Aimbot->aimbotbyFOV(localPlayer, entityList, viewAngles, Vars.aimbotFOV, Vars.aimbotSmooth, clearTarget, Vars.bRCSAimbot);
-			}
+		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6 && localPlayer) {
+			Aimbot->aimbotFOV(localPlayer, entityList, viewAngles, Vars.aimbotFOV, Vars.aimbotSmooth, clearTarget, Vars.bRCSAimbot);
 			if (clearTarget == true) clearTarget = false;
 		}
 
 		//Standalone RCS
-		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6) {
+		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6 && localPlayer) {
 			Aimbot->RCS(localPlayer, viewAngles);
 		}
 
 		//Radar and ESP
-		if ((Vars.bRadar || Vars.bESP) && GameState == 6) {
+		if ((Vars.bRadar || Vars.bESP) && GameState == 6 && localPlayer) {
 			for (unsigned short int i = 0; i < 32; i++) {
-				if (entityList->entityListObjs[i].entity == NULL) continue;
+				if (!entityList->entityListObjs[i].entity) continue;
 				Entity* entity = entityList->entityListObjs[i].entity;
 				if (entity->dormant() || entity->lifeState() != 0 || entity->health() < 1) continue;
 				if (Vars.bRadar && entity->team() != localPlayer->team()) Radar(entity);
-				if (Vars.bESP) ESP(localPlayer, entity, GlowObjectManager);
+				if (Vars.bESP && GlowObjectManager) ESP(localPlayer, entity, GlowObjectManager);
 			}
 		}
 
@@ -169,7 +171,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 	//Multi-thread bug fix for raytrace
 	typedef void(__cdecl* _freeThread)();
-	_freeThread freeFixRay = (_freeThread)GetProcAddress(GetModuleHandleA("tier0.dll"), "FreeThreadID");
+	_freeThread freeFixRay = (_freeThread)GetProcAddress(GetModuleHandleA(tier0STR), FreeThreadIDSTR);
 	freeFixRay();
 
 	FreeLibraryAndExitThread(hModule, 0);

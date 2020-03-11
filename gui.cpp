@@ -1,4 +1,7 @@
 #include "gui.hpp"
+#include "xor.hpp"
+
+#define HehexDSTR Decrypt({ 0x1, 0x2c, 0x21, 0x2c, 0x31, 0xd }).c_str()
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -73,7 +76,7 @@ namespace GUI {
 		GetWindowRect(hDesktop, &desktop);
 		GUIProps->hsize = desktop.right;
 		GUIProps->vsize = desktop.bottom;
-		GUIProps->wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, ("HehexDD"), NULL };
+		GUIProps->wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, "HehexDD", NULL };
 		RegisterClassEx(&GUIProps->wc);
 		GUIProps->hwnd = CreateWindowEx(WS_EX_LAYERED, GUIProps->wc.lpszClassName, GUIProps->wc.lpszClassName, WS_POPUP, 0, 0, GUIProps->hsize, GUIProps->vsize, NULL, NULL, GUIProps->wc.hInstance, NULL);
 		SetLayeredWindowAttributes(GUIProps->hwnd, RGB(0, 0, 0), 255, LWA_ALPHA | LWA_COLORKEY);
@@ -133,7 +136,7 @@ namespace GUI {
 			//ImGui::SetNextWindowBgAlpha(255.0f);
 			ImGui::SetNextWindowSize(ImVec2(350, 200));
 			ImGui::SetNextWindowPos(ImVec2(float((hsize - 350) / 2), float((vsize - 200) / 2)));
-			ImGui::Begin("HehexD", NULL, window_flags);
+			ImGui::Begin(HehexDSTR, NULL, window_flags);
 
 			ImGui::Checkbox(Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP); //ESP
 			ImGui::Checkbox(Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar); //Radar

@@ -6,8 +6,8 @@ void ESP(Entity* localPlayer, Entity* target, uintptr_t GlowObjectManager) {
     if (localPlayer->team() == target->team()) {
         *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x4)) = 0.f;
         *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x8)) = 0.f;
-         *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0xc)) = 1.f;
-         *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x10)) = 1.7f;
+        *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0xc)) = 1.f;
+        *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x10)) = 1.7f;
     }
     else {
         *(float*)((GlowObjectManager)+((glowIndex * 0x38) + 0x4)) = 1.f;
