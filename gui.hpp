@@ -1,13 +1,16 @@
 #pragma once
+#include <d3d9.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"
-#include <d3d9.h>
+#include "vars.hpp"
 #define DIRECTINPUT_VERSION 0x0800
 
 extern LPDIRECT3D9              g_pD3D;
 extern LPDIRECT3DDEVICE9        g_pd3dDevice;
 extern D3DPRESENT_PARAMETERS    g_d3dpp;
+
+extern Globals::myGlobals Vars;
 
 namespace GUI {
 	struct GUIStruct {
@@ -25,6 +28,6 @@ namespace GUI {
 	void CleanupDeviceD3D();
 	void ResetDevice();
 	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot);
+	void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, Globals::myGlobals *Vars);
 	
 }

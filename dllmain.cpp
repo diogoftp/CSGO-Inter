@@ -113,7 +113,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				SetForegroundWindow(GUIProps.hwnd);
 				setForeground = false;
 			}
-			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, GUIProps.hsize, GUIProps.vsize, &Vars.bESP, &Vars.bRadar, &Vars.aimbotFOV, &Vars.aimbotSmooth, &Vars.bRCSAimbot);
+			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, GUIProps.hsize, GUIProps.vsize, &Vars);
 		}
 		else {
 			ShowWindow(GUIProps.hwnd, SW_HIDE);
@@ -141,7 +141,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		//Aimbot
 		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6 && localPlayer) {
-			Aimbot->aimbotFOV(localPlayer, entityList, viewAngles, Vars.aimbotFOV, Vars.aimbotSmooth, clearTarget, Vars.bRCSAimbot);
+			Aimbot->aimbotFOV(localPlayer, entityList, viewAngles, clearTarget);
 			if (clearTarget == true) clearTarget = false;
 		}
 

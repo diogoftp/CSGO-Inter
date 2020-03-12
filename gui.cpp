@@ -3,6 +3,26 @@
 
 #define HehexDSTR Decrypt({ 0x1, 0x2c, 0x21, 0x2c, 0x31, 0xd }).c_str()
 
+#define ResetDefaultsSTR Decrypt({ 0x1b, 0x2c, 0x3a, 0x2c, 0x3d, 0x69, 0xd, 0x2c, 0x2f, 0x28, 0x3c, 0x25, 0x3d, 0x3a }).c_str()
+#define ESPSTR Decrypt({ 0xc, 0x1a, 0x19 }).c_str()
+#define RadarSTR Decrypt({ 0x1b, 0x28, 0x2d, 0x28, 0x3b }).c_str()
+#define AimbotRCSSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0x62, 0x69, 0x1b, 0xa, 0x1a }).c_str()
+#define AimbotFOVSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0xf, 0x6, 0x1f }).c_str()
+#define aAimbotFOVSTR Decrypt({ 0x6a, 0x6a, 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0xf, 0x6, 0x1f }).c_str()
+#define AimbotSmoothSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0x1a, 0x24, 0x26, 0x26, 0x3d, 0x21 }).c_str()
+#define aAimbotSmoothSTR Decrypt({ 0x6a, 0x6a, 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x1a, 0x24, 0x26, 0x26, 0x3d, 0x21 }).c_str()
+#define AimbotSmoothRandomSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0x1a, 0x24, 0x26, 0x26, 0x3d, 0x21, 0x69, 0x1b, 0x28, 0x27, 0x2d, 0x26, 0x24 }).c_str()
+#define aAimbotSmoothRandSTR Decrypt({ 0x6a, 0x6a, 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x1a, 0x24, 0x26, 0x26, 0x3d, 0x21, 0x1b, 0x28, 0x27, 0x2d }).c_str()
+#define AimbotOveraimSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0x6, 0x3f, 0x2c, 0x3b, 0x28, 0x20, 0x24 }).c_str()
+#define aAimbotOverSTR Decrypt({ 0x6a, 0x6a, 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x6, 0x3f, 0x2c, 0x3b }).c_str()
+#define RCSSmoothRandomSTR Decrypt({ 0x1b, 0xa, 0x1a, 0x69, 0x1a, 0x24, 0x26, 0x26, 0x3d, 0x21, 0x69, 0x1b, 0x28, 0x27, 0x2d, 0x26, 0x24 }).c_str()
+#define aRCSSmoothRandSTR Decrypt({ 0x6a, 0x6a, 0x1b, 0xa, 0x1a, 0x1a, 0x24, 0x26, 0x26, 0x3d, 0x21, 0x1b, 0x28, 0x27, 0x2d }).c_str()
+#define BoneSTR Decrypt({ 0xb, 0x26, 0x27, 0x2c }).c_str()
+#define HeadSTR Decrypt({ 0x1, 0x2c, 0x28, 0x2d }).c_str()
+#define NeckSTR Decrypt({ 0x7, 0x2c, 0x2a, 0x22 }).c_str()
+#define ChestSTR Decrypt({ 0xa, 0x21, 0x2c, 0x3a, 0x3d }).c_str()
+
+
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace GUI {
@@ -111,7 +131,7 @@ namespace GUI {
 		return GUIProps->hwnd;
 	}
 
-	void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, bool* bESP, bool* bRadar, float* aimbotFOV, float* aimbotSmooth, bool* bRCSAimbot) {
+	void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, Globals::myGlobals *Vars) {
 		// Poll and handle messages (inputs, window resize, etc.)
 	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 	// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -134,19 +154,57 @@ namespace GUI {
 
 		{
 			//ImGui::SetNextWindowBgAlpha(255.0f);
-			ImGui::SetNextWindowSize(ImVec2(350, 200));
-			ImGui::SetNextWindowPos(ImVec2(float((hsize - 350) / 2), float((vsize - 200) / 2)));
+			ImGui::SetNextWindowSize(ImVec2(300, 400));
+			ImGui::SetNextWindowPos(ImVec2(float((hsize - 300) / 2), float((vsize - 400) / 2)));
 			ImGui::Begin(HehexDSTR, NULL, window_flags);
 
-			ImGui::Checkbox(Decrypt({ 0xC, 0x1A, 0x19 }).c_str(), bESP); //ESP
-			ImGui::Checkbox(Decrypt({ 0x1B, 0x28, 0x2D, 0x28, 0x3B }).c_str(), bRadar); //Radar
-			ImGui::Checkbox(Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x1b, 0xa, 0x1a }).c_str(), bRCSAimbot); //RCSAimbot
-			ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0xF, 0x6, 0x1F }).c_str(), aimbotFOV, 1.0f, 360.0f, "%.1f"); //AimbotFOV
-			if (*aimbotFOV > 360.0f) *aimbotFOV = 360.0f;
-			else if (*aimbotFOV < 1.0f) *aimbotFOV = 1.0f;
-			ImGui::SliderFloat(Decrypt({ 0x8, 0x20, 0x24, 0x2B, 0x26, 0x3D, 0x69, 0x1A, 0x24, 0x26, 0x26, 0x3D, 0x21 }).c_str(), aimbotSmooth, 0.0f, 20.0f, "%.1f"); //AimbotSmooth
-			if (*aimbotSmooth > 20.0f) *aimbotSmooth = 20.0f;
-			else if (*aimbotSmooth < 0.0f || (*aimbotSmooth > 0.0f && *aimbotSmooth < 1.0f)) *aimbotSmooth = 1.0f;
+			ImGui::Indent(90);
+			if (ImGui::Button(ResetDefaultsSTR)) Vars->restoreValues(); //Reset Defaults
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Spacing();
+			ImGui::Indent(-90);
+
+			ImGui::Checkbox(ESPSTR, &Vars->bESP); //ESP
+
+			ImGui::Checkbox(RadarSTR, &Vars->bRadar); //Radar
+
+			ImGui::Checkbox(AimbotRCSSTR, &Vars->bRCSAimbot); //RCSAimbot
+
+			ImGui::Text(AimbotFOVSTR);
+			ImGui::SliderFloat(aAimbotFOVSTR, &Vars->aimbotFOV, 1.0f, 360.0f, "%.1f"); //AimbotFOV
+			if (Vars->aimbotFOV > 360.0f) Vars->aimbotFOV = 360.0f;
+			else if (Vars->aimbotFOV < 1.0f) Vars->aimbotFOV = 1.0f;
+
+			ImGui::Spacing();
+			ImGui::Text(AimbotSmoothSTR);
+			ImGui::SliderFloat(aAimbotSmoothSTR, &Vars->aimbotSmooth, 0.0f, 20.0f, "%.1f"); //AimbotSmooth
+			if (Vars->aimbotSmooth > 20.0f) Vars->aimbotSmooth = 20.0f;
+			else if (Vars->aimbotSmooth < 0.0f || (Vars->aimbotSmooth > 0.0f && Vars->aimbotSmooth < 1.0f)) Vars->aimbotSmooth = 1.0f;
+
+			ImGui::Spacing();
+			ImGui::Text(AimbotSmoothRandomSTR);
+			ImGui::SliderFloat(aAimbotSmoothRandSTR, &Vars->aimbotSmoothRand, 0.0f, 5.0f, "%.01f"); //AimbotSmoothRand
+			if (Vars->aimbotSmoothRand < 0.0f) Vars->aimbotSmoothRand = 0.0f;
+			else if (Vars->aimbotSmoothRand > 5.0f) Vars->aimbotSmoothRand = 5.0f;
+
+			ImGui::Spacing();
+			ImGui::Text(AimbotOveraimSTR);
+			ImGui::SliderFloat(aAimbotOverSTR, &Vars->aimbotOver, 0.0f, 5.0f, "%.01f"); //AimbotOver
+			if (Vars->aimbotOver < 0.0f) Vars->aimbotOver = 0.0f;
+			else if (Vars->aimbotOver > 5.0f) Vars->aimbotOver = 5.0f;
+
+			ImGui::Spacing();
+			ImGui::Text(RCSSmoothRandomSTR);
+			ImGui::SliderFloat(aRCSSmoothRandSTR, &Vars->RCSSmoothRand, 0.0f, 2.0f, "%.1f"); //RCSSmoothRand
+			if (Vars->RCSSmoothRand < 0.0f) Vars->RCSSmoothRand = 0.0f;
+			else if (Vars->RCSSmoothRand > 2.0f) Vars->RCSSmoothRand = 2.0f;
+
+			ImGui::Spacing();
+			ImGui::Text(BoneSTR); //Bone
+			ImGui::RadioButton(HeadSTR, &Vars->boneIndex, 8); ImGui::SameLine(); //Head
+			ImGui::RadioButton(NeckSTR, &Vars->boneIndex, 7); ImGui::SameLine(); //Neck
+			ImGui::RadioButton(ChestSTR, &Vars->boneIndex, 6); //Chest
 
 			ImGui::End();
 		}

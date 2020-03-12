@@ -25,10 +25,10 @@ public:
 	//bool isSpotted(Entity* localPlayer, Entity* target);
 	bool isVisible(Entity* localPlayer, Entity* target);
 	bool smokeCheck(Vec3 src, Vec3 dst);
-	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, float aimbotFOV, float aimbotSmooth, bool clearTarget, bool bRCSAimbot);
-	void doAimbot(Entity* localPlayer, Vec3* viewangles, Vec3 targetPoint, float aimbotSmooth, bool bRCSAimbot);
-	void doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entityList, float aimbotFOV, bool bRCSAimbot);
-	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt, int boneIndex);
+	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, bool clearTarget);
+	void doAimbot(Entity* localPlayer, Vec3* viewangles, Vec3 targetPoint);
+	void doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entityList);
+	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt);
 	void RCS(Entity* localPlayer, Vec3* viewAngles);
 private:
 	const float pi = 3.14159265358979323846f;
