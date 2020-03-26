@@ -13,6 +13,7 @@
 #include "ESP.hpp"
 #include "radar.hpp"
 #include "aimbot.hpp"
+#include "scorewall.hpp"
 
 //#define DEBUG1 1
 
@@ -66,8 +67,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 	Offsets::Setup();
 	//Hooks::Setup();
 
-	aimbot *Aimbot = new aimbot;
-
 	//CGlobalVarsBase* globals = (CGlobalVarsBase*)(Offsets::dwEngine + Offsets::dwGlobalVars);
 	EntList* entityList = (EntList*)(Offsets::dwClient + Offsets::dwEntityList);
 
@@ -82,7 +81,6 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		#ifdef DEBUG1
 		system("cls");
 		//std::cout << "FPS: " << 1.0f / globals->frametime << std::endl;
-		std::cout << "ADD: " << Offsets::LineGoesThroughSmoke << std::endl;;
 		std::cout << "FOV: " << Vars.aimbotFOV << std::endl;
 		std::cout << "Smooth: " << Vars.aimbotSmooth << std::endl;
 		std::cout << "Radar: " << Vars.bRadar << std::endl;
@@ -113,7 +111,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				SetForegroundWindow(GUIProps.hwnd);
 				setForeground = false;
 			}
-			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, GUIProps.hsize, GUIProps.vsize, &Vars);
+			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, GUIProps.right, GUIProps.bottom, &Vars);
 		}
 		else {
 			ShowWindow(GUIProps.hwnd, SW_HIDE);
@@ -140,18 +138,21 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 		}
 
 		//Aimbot
-		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6 && localPlayer) {
-			Aimbot->aimbotFOV(localPlayer, entityList, viewAngles, clearTarget);
+		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6 && localPlayer && entityList && viewAngles) {
+			aimbot::aimbotFOV(localPlayer, entityList, viewAngles, clearTarget);
 			if (clearTarget == true) clearTarget = false;
 		}
 
 		//Standalone RCS
-		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6 && localPlayer) {
-			Aimbot->RCS(localPlayer, viewAngles);
+		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6 && localPlayer && viewAngles) {
+			aimbot::RCS(localPlayer, viewAngles);
 		}
 
+		//Scoreboard Wallhack
+		if (GetAsyncKeyState(VK_TAB) && Vars.bScoreWall && localPlayer && entityList && GameState == 6) scoreWall(GUIProps, localPlayer, viewAngles, entityList);
+
 		//Radar and ESP
-		if ((Vars.bRadar || Vars.bESP) && GameState == 6 && localPlayer) {
+		if ((Vars.bRadar || Vars.bESP) && GameState == 6 && localPlayer && entityList) {
 			for (unsigned short int i = 0; i < 32; i++) {
 				if (!entityList->entityListObjs[i].entity) continue;
 				Entity* entity = entityList->entityListObjs[i].entity;

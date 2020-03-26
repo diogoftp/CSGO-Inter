@@ -6,6 +6,7 @@
 #define ResetDefaultsSTR Decrypt({ 0x1b, 0x2c, 0x3a, 0x2c, 0x3d, 0x69, 0xd, 0x2c, 0x2f, 0x28, 0x3c, 0x25, 0x3d, 0x3a }).c_str()
 #define ESPSTR Decrypt({ 0xc, 0x1a, 0x19 }).c_str()
 #define RadarSTR Decrypt({ 0x1b, 0x28, 0x2d, 0x28, 0x3b }).c_str()
+#define ScoreboardSTR Decrypt({ 0x1a, 0x2a, 0x26, 0x3b, 0x2c, 0x2b, 0x26, 0x28, 0x3b, 0x2d }).c_str()
 #define AimbotRCSSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0x62, 0x69, 0x1b, 0xa, 0x1a }).c_str()
 #define AimbotFOVSTR Decrypt({ 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0x69, 0xf, 0x6, 0x1f }).c_str()
 #define aAimbotFOVSTR Decrypt({ 0x6a, 0x6a, 0x8, 0x20, 0x24, 0x2b, 0x26, 0x3d, 0xf, 0x6, 0x1f }).c_str()
@@ -94,11 +95,13 @@ namespace GUI {
 		RECT desktop;
 		const HWND hDesktop = GetDesktopWindow();
 		GetWindowRect(hDesktop, &desktop);
-		GUIProps->hsize = desktop.right;
-		GUIProps->vsize = desktop.bottom;
+		GUIProps->left = desktop.left;
+		GUIProps->right = desktop.right;
+		GUIProps->bottom = desktop.bottom;
+		GUIProps->top = desktop.top;
 		GUIProps->wc = { sizeof(WNDCLASSEX), NULL, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, (HBRUSH)RGB(0, 0, 0), NULL, "HehexDD", NULL };
 		RegisterClassEx(&GUIProps->wc);
-		GUIProps->hwnd = CreateWindowEx(WS_EX_LAYERED, GUIProps->wc.lpszClassName, GUIProps->wc.lpszClassName, WS_POPUP, 0, 0, GUIProps->hsize, GUIProps->vsize, NULL, NULL, GUIProps->wc.hInstance, NULL);
+		GUIProps->hwnd = CreateWindowEx(WS_EX_LAYERED, GUIProps->wc.lpszClassName, GUIProps->wc.lpszClassName, WS_POPUP, 0, 0, GUIProps->right, GUIProps->bottom, NULL, NULL, GUIProps->wc.hInstance, NULL);
 		SetLayeredWindowAttributes(GUIProps->hwnd, RGB(0, 0, 0), 255, LWA_ALPHA | LWA_COLORKEY);
 		GUIProps->msg;
 		ZeroMemory(&GUIProps->msg, sizeof(GUIProps->msg));
@@ -131,7 +134,7 @@ namespace GUI {
 		return GUIProps->hwnd;
 	}
 
-	void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, Globals::myGlobals *Vars) {
+	void windowLoop(HWND hwnd, MSG msg, int right, int bottom, Globals::myGlobals *Vars) {
 		// Poll and handle messages (inputs, window resize, etc.)
 	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 	// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -154,8 +157,8 @@ namespace GUI {
 
 		{
 			//ImGui::SetNextWindowBgAlpha(255.0f);
-			ImGui::SetNextWindowSize(ImVec2(300, 400));
-			ImGui::SetNextWindowPos(ImVec2(float((hsize - 300) / 2), float((vsize - 400) / 2)));
+			ImGui::SetNextWindowSize(ImVec2(300, 420));
+			ImGui::SetNextWindowPos(ImVec2(float((right - 300) / 2), float((bottom - 420) / 2)));
 			ImGui::Begin(HehexDSTR, NULL, window_flags);
 
 			ImGui::Indent(90);
@@ -168,6 +171,8 @@ namespace GUI {
 			ImGui::Checkbox(ESPSTR, &Vars->bESP); //ESP
 
 			ImGui::Checkbox(RadarSTR, &Vars->bRadar); //Radar
+
+			ImGui::Checkbox(ScoreboardSTR, &Vars->bScoreWall); //Scoreboard Wall
 
 			ImGui::Checkbox(AimbotRCSSTR, &Vars->bRCSAimbot); //RCSAimbot
 

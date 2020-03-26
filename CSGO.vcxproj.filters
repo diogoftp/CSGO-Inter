@@ -71,6 +71,9 @@
     <ClCompile Include="SDK\vec3.cpp">
       <Filter>SDK</Filter>
     </ClCompile>
+    <ClCompile Include="scorewall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aimbot.hpp">
@@ -153,6 +156,9 @@
     </ClInclude>
     <ClInclude Include="SDK\GlobalVars.hpp">
       <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="scorewall.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

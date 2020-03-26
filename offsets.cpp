@@ -88,6 +88,7 @@ namespace Offsets {
 		dwEntityList = PatternScan(client_panoramadllSTR, "\xBB\x00\x00\x00\x00\x83\xFF\x01\x0F\x8C\x00\x00\x00\x00\x3B\xF8", "x????xxxxx????xx", { 1 }, 0, true);
 		dwGetAllClasses = PatternScan(client_panoramadllSTR, "\xA1\x00\x00\x00\x00\xC3\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xCC\xA1\x00\x00\x00\x00\xB9", "x????xxxxxxxxxxxx????x", { 1, 0 }, 0, true);
 		LineGoesThroughSmoke = PatternScan(client_panoramadllSTR, "\x55\x8B\xEC\x83\xEC\x08\x8B\x15\x00\x00\x00\x00\x0F\x57\xC0", "xxxxxxxx????xxx", { }, 0, false); //Func
+		dwViewMatrix = PatternScan(client_panoramadllSTR, "\x0F\x10\x05\x00\x00\x00\x00\x8D\x85\x00\x00\x00\x00\xB9", "xxx????xx????x", { 3 }, 176, true);
 
 		//engine.dll
 		dwClientState = PatternScan(enginedllSTR, "\xA1\x00\x00\x00\x00\x33\xD2\x6A\x00\x6A\x00\x33\xC9\x89\xB0", "x????xxxxxxxxxx", { 1 }, 0, true);
@@ -99,9 +100,6 @@ namespace Offsets {
 
 		//Netvars
 		//DT_BasePlayer
-		//m_iHealth = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, aaag_BaseClientDLL->GetAllClasses());
-		//m_iHealth = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, bbb((ClientClass*)(dwClient + Offsets::dwGetAllClasses)));
-		
 		m_iHealth = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iHealthSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 		m_iTeamNum = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_iTeamNumSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 		m_vecOrigin = Interfaces::GetNetVarOffset(DT_BasePlayerSTR, m_vecOriginSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));

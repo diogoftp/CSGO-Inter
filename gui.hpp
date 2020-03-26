@@ -16,8 +16,10 @@ namespace GUI {
 	struct GUIStruct {
 		HWND hwnd = nullptr;
 		WNDCLASSEX wc;
-		int hsize = 0;
-		int vsize = 0;
+		int left = 0;
+		int right = 0;
+		int bottom = 0;
+		int top = 0;
 		MSG msg;
 	};
 

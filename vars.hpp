@@ -6,7 +6,7 @@ namespace Globals {
 		float aimbotSmoothRand = 2.5f;
 		float aimbotOver = 0.14f;
 		float RCSSmoothRand = 0.1f;
-		bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true;
+		bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true, bScoreWall = false;
 		int boneIndex = 7;
 
 		void restoreValues() {
@@ -19,6 +19,7 @@ namespace Globals {
 		bESP = false;
 		bMenu = true;
 		bRCSAimbot = true;
+		bScoreWall = false;
 		boneIndex = 7;
 		}
 	};

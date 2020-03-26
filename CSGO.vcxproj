@@ -199,6 +199,7 @@
     <ClCompile Include="interfaces.cpp" />
     <ClCompile Include="offsets.cpp" />
     <ClCompile Include="radar.cpp" />
+    <ClCompile Include="scorewall.cpp" />
     <ClCompile Include="SDK\vec3.cpp" />
     <ClCompile Include="SDK\vector2D.cpp" />
     <ClCompile Include="SDK\VMatrix.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="interfaces.hpp" />
     <ClInclude Include="offsets.hpp" />
     <ClInclude Include="radar.hpp" />
+    <ClInclude Include="scorewall.hpp" />
     <ClInclude Include="SDK\GlobalVars.hpp" />
     <ClInclude Include="SDK\IClientMode.hpp" />
     <ClInclude Include="SDK\IEngineTrace.hpp" />

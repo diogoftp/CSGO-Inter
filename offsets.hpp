@@ -39,6 +39,7 @@ namespace Offsets {
 	inline ptrdiff_t dwEntityList = NULL;
 	inline ptrdiff_t dwGetAllClasses = NULL;
 	inline ptrdiff_t LineGoesThroughSmoke = NULL; //Func
+	inline ptrdiff_t dwViewMatrix = NULL;
 
 	//engine.dll
 	inline ptrdiff_t dwClientState = NULL;

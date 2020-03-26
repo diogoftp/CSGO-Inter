@@ -1,21 +1,18 @@
 #pragma once
 #include "SDK/SDK.hpp"
 
-class aimbot {
-public:
-	struct TList {
-		Entity* target = nullptr;
-		float dist = 0.0f;
+struct TList {
+	Entity* target = nullptr;
+	float dist = 0.0f;
 
-		TList(Entity* t, const float& d) : target(t), dist(d) {}
+	TList(Entity* t, const float& d) : target(t), dist(d) {}
 
-		bool operator< (const TList& cs) const {
-			return (dist < cs.dist);
-		}
-	};
+	bool operator< (const TList& cs) const {
+		return (dist < cs.dist);
+	}
+};
 
-	aimbot();
-	~aimbot();
+namespace aimbot {
 	float mag3D(Vec3 src);
 	Vec3 calcAngle3D(Vec3 src, Vec3 dst);
 	Vec3 clamp(Vec3 angles);
@@ -30,9 +27,4 @@ public:
 	void doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entityList);
 	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt);
 	void RCS(Entity* localPlayer, Vec3* viewAngles);
-private:
-	const float pi = 3.14159265358979323846f;
-	Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
-	Entity* aimTarget = nullptr;
-	std::vector<TList> targetList;
-};
+}
