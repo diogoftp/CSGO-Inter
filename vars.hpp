@@ -1,8 +1,8 @@
 #pragma once
 namespace Globals {
 	struct myGlobals {
-		float aimbotFOV = 3.0f;
-		float aimbotSmooth = 4.0f;
+		float aimbotFOV = 2.0f;
+		float aimbotSmooth = 2.5f;
 		float aimbotSmoothRand = 2.5f;
 		float aimbotOver = 0.05f;
 		float RCSSmoothRand = 0.1f;
