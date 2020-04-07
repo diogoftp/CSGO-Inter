@@ -111,7 +111,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 				SetForegroundWindow(GUIProps.hwnd);
 				setForeground = false;
 			}
-			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, GUIProps.right, GUIProps.bottom, &Vars);
+			GUI::windowLoop(GUIProps.hwnd, GUIProps.msg, &Vars, &GUIProps);
 		}
 		else {
 			ShowWindow(GUIProps.hwnd, SW_HIDE);

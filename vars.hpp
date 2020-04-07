@@ -10,10 +10,10 @@ namespace Globals {
 		int boneIndex = 7;
 
 		void restoreValues() {
-		aimbotFOV = 3.0f;
-		aimbotSmooth = 4.0f;
+		aimbotFOV = 2.0f;
+		aimbotSmooth = 2.5f;
 		aimbotSmoothRand = 2.5f;
-		aimbotOver = 0.14f;
+		aimbotOver = 0.05f;
 		RCSSmoothRand = 0.1f;
 		bRadar = false;
 		bESP = false;

@@ -1,13 +1,14 @@
 #include "aimbot.hpp"
 #include "interfaces.hpp"
 #include "vars.hpp"
+#include "scorewall.hpp" //WorldToScreen
 #include <thread>
 #include <chrono>
 #include <algorithm>
 #include <vector>
-#include "scorewall.hpp"
 
 extern Globals::myGlobals Vars;
+
 const float pi = 3.14159265358979323846f;
 Vec3 oldAngle = { 0.0f, 0.0f, 0.0f };
 Entity* aimTarget = nullptr;
@@ -116,7 +117,7 @@ namespace aimbot {
 		}
 		if (aimTarget) {
 			float dynFOV = 0.0f;
-			dynFOV = localPlayer->shotsFired() * 0.65f;
+			dynFOV = localPlayer->shotsFired() * 0.65f; //0.65f is a magic number
 			Vec3 targetPoint = calcTarget(localPlayer, viewAngles, aimTarget);
 			if (targetPoint.y > 180) targetPoint.y -= 360;
 			if (targetPoint.y < -180) targetPoint.y += 360;
@@ -129,8 +130,8 @@ namespace aimbot {
 					ViewMatrix_t ViewMatrix = *(ViewMatrix_t*)(Offsets::dwClient + Offsets::dwViewMatrix);
 					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(8), head);
 					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(7), neck);
-					float dif = abs(head[0] - neck[0] + head[1] - neck[1]);
-					if (abs(mag3D(targetPoint)) > dif * 0.1f || localPlayer->shotsFired() > 0) { //Anti shake
+					float dif = abs(head[0] - neck[0] + head[1] - neck[1]); //Head to neck distance aspect ratio
+					if (abs(mag3D(targetPoint)) > dif * 0.1f || localPlayer->shotsFired() > 0) { //Anti shake, 0.1f is a magic number
 						doAimbot(localPlayer, viewAngles, targetPoint);
 					}
 				}
@@ -158,7 +159,7 @@ namespace aimbot {
 		if (myAngle.y > 180.0f) myAngle.y = -179.99999f;
 		normalize(myAngle);
 		clamp(myAngle);
-		viewAngles->x = myAngle.x;
+		if (aimTarget->onGround()) viewAngles->x = myAngle.x; //Dont move crosshair up when target jumps
 		viewAngles->y = myAngle.y;
 	}
 

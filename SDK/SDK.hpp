@@ -49,6 +49,9 @@ public:
 	Vec3 velocity() {
 		return *(Vec3*)((uintptr_t)this + Offsets::m_vecVelocity);
 	}
+	bool onGround() {
+		return (*(bool*)((uintptr_t)this + Offsets::m_fFlags)) & (1<<0);
+	}
 };
 
 class EntityListObj {

@@ -1,6 +1,9 @@
 #include "gui.hpp"
 #include "xor.hpp"
 
+#define hSize 300
+#define vSize 470
+
 #define HehexDSTR Decrypt({ 0x1, 0x2c, 0x21, 0x2c, 0x31, 0xd }).c_str()
 
 #define ResetDefaultsSTR Decrypt({ 0x1b, 0x2c, 0x3a, 0x2c, 0x3d, 0x69, 0xd, 0x2c, 0x2f, 0x28, 0x3c, 0x25, 0x3d, 0x3a }).c_str()
@@ -22,6 +25,9 @@
 #define HeadSTR Decrypt({ 0x1, 0x2c, 0x28, 0x2d }).c_str()
 #define NeckSTR Decrypt({ 0x7, 0x2c, 0x2a, 0x22 }).c_str()
 #define ChestSTR Decrypt({ 0xa, 0x21, 0x2c, 0x3a, 0x3d }).c_str()
+#define ResolutionSTR Decrypt({ 0x1b, 0x2c, 0x3a, 0x26, 0x25, 0x3c, 0x3d, 0x20, 0x26, 0x27 }).c_str()
+#define aResolutionSTR Decrypt({ 0x6a, 0x6a, 0x1b, 0x2c, 0x3a, 0x26, 0x25, 0x3c, 0x3d, 0x20, 0x26, 0x27 }).c_str()
+
 
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -134,7 +140,7 @@ namespace GUI {
 		return GUIProps->hwnd;
 	}
 
-	void windowLoop(HWND hwnd, MSG msg, int right, int bottom, Globals::myGlobals *Vars) {
+	void windowLoop(HWND hwnd, MSG msg, Globals::myGlobals* Vars, GUIStruct* GUIProps) {
 		// Poll and handle messages (inputs, window resize, etc.)
 	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 	// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -157,8 +163,8 @@ namespace GUI {
 
 		{
 			//ImGui::SetNextWindowBgAlpha(255.0f);
-			ImGui::SetNextWindowSize(ImVec2(300, 420));
-			ImGui::SetNextWindowPos(ImVec2(float((right - 300) / 2), float((bottom - 420) / 2)));
+			ImGui::SetNextWindowSize(ImVec2(hSize, vSize));
+			ImGui::SetNextWindowPos(ImVec2(float((GUIProps->right - hSize) / 2), float((GUIProps->bottom - vSize) / 2)));
 			ImGui::Begin(HehexDSTR, NULL, window_flags);
 
 			ImGui::Indent(90);
@@ -211,9 +217,29 @@ namespace GUI {
 			ImGui::RadioButton(NeckSTR, &Vars->boneIndex, 7); ImGui::SameLine(); //Neck
 			ImGui::RadioButton(ChestSTR, &Vars->boneIndex, 6); //Chest
 
+			ImGui::Spacing();
+			static const char* resolutions[]{"1920x1080", "1080x1080"};
+			static int selectedResolution = 0;
+			ImGui::Text(ResolutionSTR); //Resolution
+			ImGui::Combo(aResolutionSTR, &selectedResolution, resolutions, IM_ARRAYSIZE(resolutions));
+			switch (selectedResolution) {
+			case 0:
+				GUIProps->right = 1920;
+				GUIProps->bottom = 1080;
+				break;
+
+			case 1:
+				GUIProps->right = 1080;
+				GUIProps->bottom = 1080;
+				break;
+			default:
+				GUIProps->right = 1920;
+				GUIProps->bottom = 1080;
+				break;
+			}
+
 			ImGui::End();
 		}
-
 
 		// Rendering
 		ImGui::EndFrame();

@@ -1,10 +1,6 @@
 #include "scorewall.hpp"
 #include <WinUser.h>
 #include <Windows.h>
-#include "aimbot.hpp"
-#include "vars.hpp"
-
-extern Globals::myGlobals Vars;
 
 float Dist3D(Vec3 myCoords, Vec3 enemyCoords) {
 	return sqrt(
@@ -34,7 +30,7 @@ bool WorldToScreen(GUI::GUIStruct GUIProps, ViewMatrix_t matrix, Vec3 pos, float
 
 void scoreWall(GUI::GUIStruct GUIProps, Entity* localPlayer, Vec3* viewAngles, EntList* entityList) {
 	float closestEntityDistance = 999999999.0f;
-	float EnemyXY[2] = {};
+	float EnemyXY[2] = { 0 };
 	ViewMatrix_t ViewMatrix;
 	Vec3 closestEntity;
 	ViewMatrix = *(ViewMatrix_t*)(Offsets::dwClient + Offsets::dwViewMatrix);
@@ -43,12 +39,12 @@ void scoreWall(GUI::GUIStruct GUIProps, Entity* localPlayer, Vec3* viewAngles, E
 	for (unsigned short int i = 0; i < 32; i++) {
 		if (!entityList->entityListObjs[i].entity) continue;
 		Entity* entity = entityList->entityListObjs[i].entity;
-		if (entity->dormant() || entity->lifeState() != 0 || entity->health() < 1 || entity->team() == localPlayer->team()) continue;
+		if (entity == localPlayer || entity->dormant() || entity->lifeState() != 0 || entity->health() < 1 || entity->team() == localPlayer->team()) continue;
 		Vec3 entityPosition = entity->origin() + entity->viewOffset();
 		Vec3 myPosition = localPlayer->origin() + localPlayer->viewOffset();
 		if (WorldToScreen(GUIProps, ViewMatrix, entityPosition, EnemyXY)) {
 			float distance = Dist3D(myPosition, entityPosition);
-			if (EnemyXY[0] > 1920 || EnemyXY[1] > 1080 || EnemyXY[0] < 0 || EnemyXY[1] < 0) continue;
+			if (EnemyXY[0] > GUIProps.right || EnemyXY[1] > GUIProps.bottom || EnemyXY[0] < 0 || EnemyXY[1] < 0) continue;
 			if (distance < closestEntityDistance) {
 				closestEntityDistance = distance;
 				closestEntity = entityPosition;
@@ -57,7 +53,7 @@ void scoreWall(GUI::GUIStruct GUIProps, Entity* localPlayer, Vec3* viewAngles, E
 		}
 	}
 	if (achou == true && WorldToScreen(GUIProps, ViewMatrix, closestEntity, EnemyXY)) {
-		if (EnemyXY[0] < 1920 && EnemyXY[1] < 1080 && EnemyXY[0] > 0 && EnemyXY[1] > 0) {
+		if (EnemyXY[0] < GUIProps.right && EnemyXY[1] < GUIProps.bottom && EnemyXY[0] > 0 && EnemyXY[1] > 0) {
 			SetCursorPos((int)EnemyXY[0], (int)EnemyXY[1]);
 		}
 	}

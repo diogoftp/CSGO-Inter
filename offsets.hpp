@@ -24,6 +24,7 @@ namespace Offsets {
 	inline ptrdiff_t m_iGlowIndex = NULL;
 	inline ptrdiff_t m_iShotsFired = NULL;
 	inline ptrdiff_t m_vecVelocity = NULL;
+	inline ptrdiff_t m_fFlags = NULL;
 
 	//DT_BaseEntity
 	inline ptrdiff_t m_bSpotted = NULL;

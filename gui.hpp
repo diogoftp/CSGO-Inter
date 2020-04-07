@@ -15,12 +15,12 @@ extern Globals::myGlobals Vars;
 namespace GUI {
 	struct GUIStruct {
 		HWND hwnd = nullptr;
-		WNDCLASSEX wc;
+		WNDCLASSEX wc{ 0 };
 		int left = 0;
 		int right = 0;
 		int bottom = 0;
 		int top = 0;
-		MSG msg;
+		MSG msg{ 0 };
 	};
 
 	// Forward declarations of helper functions
@@ -30,6 +30,6 @@ namespace GUI {
 	void CleanupDeviceD3D();
 	void ResetDevice();
 	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void windowLoop(HWND hwnd, MSG msg, int hsize, int vsize, Globals::myGlobals *Vars);
+	void windowLoop(HWND hwnd, MSG msg, Globals::myGlobals* Vars, GUIStruct* GUIProps);
 	
 }
