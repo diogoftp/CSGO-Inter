@@ -23,6 +23,7 @@
 #define m_vecViewOffsetSTR Decrypt({ 0x24, 0x16, 0x3f, 0x2c, 0x2a, 0x1f, 0x20, 0x2c, 0x3e, 0x6, 0x2f, 0x2f, 0x3a, 0x2c, 0x3d, 0x12, 0x79, 0x14 }).c_str()
 #define m_flFlashDurationSTR Decrypt({ 0x24, 0x16, 0x2f, 0x25, 0xf, 0x25, 0x28, 0x3a, 0x21, 0xd, 0x3c, 0x3b, 0x28, 0x3d, 0x20, 0x26, 0x27 }).c_str()
 #define m_iShotsFiredSTR Decrypt({ 0x24, 0x16, 0x20, 0x1a, 0x21, 0x26, 0x3d, 0x3a, 0xf, 0x20, 0x3b, 0x2c, 0x2d }).c_str()
+#define m_vecVelocitySTR Decrypt({ 0x24, 0x16, 0x3f, 0x2c, 0x2a, 0x1f, 0x2c, 0x25, 0x26, 0x2a, 0x20, 0x3d, 0x30, 0x12, 0x79, 0x14 }).c_str()
 #define m_bSpottedSTR Decrypt({ 0x24, 0x16, 0x2b, 0x1a, 0x39, 0x26, 0x3d, 0x3d, 0x2c, 0x2d }).c_str()
 #define m_bSpottedByMaskSTR Decrypt({ 0x24, 0x16, 0x2b, 0x1a, 0x39, 0x26, 0x3d, 0x3d, 0x2c, 0x2d, 0xb, 0x30, 0x4, 0x28, 0x3a, 0x22 }).c_str()
 #define m_nForceBoneSTR Decrypt({ 0x24, 0x16, 0x27, 0xf, 0x26, 0x3b, 0x2a, 0x2c, 0xb, 0x26, 0x27, 0x2c }).c_str()
@@ -94,7 +95,7 @@ namespace Offsets {
 		dwClientState = PatternScan(enginedllSTR, "\xA1\x00\x00\x00\x00\x33\xD2\x6A\x00\x6A\x00\x33\xC9\x89\xB0", "x????xxxxxxxxxx", { 1 }, 0, true);
 		dwClientState_State = PatternScan(enginedllSTR, "\x83\xB8\x00\x00\x00\x00\x00\x0F\x94\xC0\xC3", "xx?????xxxx", { 2 }, 0, false);
 		dwClientState_ViewAngles = PatternScan(enginedllSTR, "\xF3\x0F\x11\x80\x00\x00\x00\x00\xD9\x46\x04\xD9\x05", "xxxx????xxxxx", { 4 }, 0, false);
-		//dwGlobalVars = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xFF\x50\x08\x85\xC0", "x????x????xxxxx", { 1 }, 0, true);
+		dwGlobalVars = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x68\x00\x00\x00\x00\xFF\x50\x08\x85\xC0", "x????x????xxxxx", { 1 }, 0, true);
 		//dwGameDir = PatternScan(enginedllSTR, "\x68\x00\x00\x00\x00\x8D\x85\x00\x00\x00\x00\x50\x68\x00\x00\x00\x00\x68", "x????xx????xx????x", { 1 }, 0, true);
 		//dwClientState_MapDirectory = PatternScan(enginedllSTR, "\xB8\x00\x00\x00\x00\xC3\x05\x00\x00\x00\x00\xC3", "x????xx????x", { 7 }, 0, false);
 
@@ -111,6 +112,7 @@ namespace Offsets {
 		m_vecViewOffset = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_vecViewOffsetSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 		m_iGlowIndex = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_flFlashDurationSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses)) + 24;
 		m_iShotsFired = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_iShotsFiredSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
+		m_vecVelocity = Interfaces::GetNetVarOffset(DT_CSPlayerSTR, m_vecVelocitySTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));
 
 		//DT_BaseEntity
 		m_bSpotted = Interfaces::GetNetVarOffset(DT_BaseEntitySTR, m_bSpottedSTR, (ClientClass*)(dwClient + Offsets::dwGetAllClasses));

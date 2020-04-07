@@ -4,7 +4,7 @@ namespace Globals {
 		float aimbotFOV = 3.0f;
 		float aimbotSmooth = 4.0f;
 		float aimbotSmoothRand = 2.5f;
-		float aimbotOver = 0.14f;
+		float aimbotOver = 0.05f;
 		float RCSSmoothRand = 0.1f;
 		bool bRadar = false, bESP = false, bMenu = true, bRCSAimbot = true, bScoreWall = false;
 		int boneIndex = 7;

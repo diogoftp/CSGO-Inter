@@ -189,13 +189,13 @@ namespace GUI {
 
 			ImGui::Spacing();
 			ImGui::Text(AimbotSmoothRandomSTR);
-			ImGui::SliderFloat(aAimbotSmoothRandSTR, &Vars->aimbotSmoothRand, 0.0f, 5.0f, "%.01f"); //AimbotSmoothRand
+			ImGui::SliderFloat(aAimbotSmoothRandSTR, &Vars->aimbotSmoothRand, 0.0f, 5.0f, "%.2f"); //AimbotSmoothRand
 			if (Vars->aimbotSmoothRand < 0.0f) Vars->aimbotSmoothRand = 0.0f;
 			else if (Vars->aimbotSmoothRand > 5.0f) Vars->aimbotSmoothRand = 5.0f;
 
 			ImGui::Spacing();
 			ImGui::Text(AimbotOveraimSTR);
-			ImGui::SliderFloat(aAimbotOverSTR, &Vars->aimbotOver, 0.0f, 5.0f, "%.01f"); //AimbotOver
+			ImGui::SliderFloat(aAimbotOverSTR, &Vars->aimbotOver, 0.0f, 5.0f, "%.2f"); //AimbotOver
 			if (Vars->aimbotOver < 0.0f) Vars->aimbotOver = 0.0f;
 			else if (Vars->aimbotOver > 5.0f) Vars->aimbotOver = 5.0f;
 

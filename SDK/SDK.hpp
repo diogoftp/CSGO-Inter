@@ -46,6 +46,9 @@ public:
 		bones.z = *(float*)(BoneBase + 0x30 * bone + 0x2C);
 		return bones;
 	}
+	Vec3 velocity() {
+		return *(Vec3*)((uintptr_t)this + Offsets::m_vecVelocity);
+	}
 };
 
 class EntityListObj {

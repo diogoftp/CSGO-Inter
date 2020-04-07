@@ -23,6 +23,7 @@ namespace Offsets {
 	inline ptrdiff_t m_vecViewOffset = NULL;
 	inline ptrdiff_t m_iGlowIndex = NULL;
 	inline ptrdiff_t m_iShotsFired = NULL;
+	inline ptrdiff_t m_vecVelocity = NULL;
 
 	//DT_BaseEntity
 	inline ptrdiff_t m_bSpotted = NULL;
@@ -45,7 +46,7 @@ namespace Offsets {
 	inline ptrdiff_t dwClientState = NULL;
 	inline ptrdiff_t dwClientState_State = NULL;
 	inline ptrdiff_t dwClientState_ViewAngles = NULL;
-	//inline ptrdiff_t dwGlobalVars = NULL;
+	inline ptrdiff_t dwGlobalVars = NULL;
 	//inline ptrdiff_t dwGameDir = NULL;
 	//inline ptrdiff_t dwClientState_MapDirectory = NULL;
 }

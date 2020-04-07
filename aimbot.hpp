@@ -1,5 +1,6 @@
 #pragma once
 #include "SDK/SDK.hpp"
+#include "gui.hpp"
 
 struct TList {
 	Entity* target = nullptr;
@@ -22,9 +23,9 @@ namespace aimbot {
 	//bool isSpotted(Entity* localPlayer, Entity* target);
 	bool isVisible(Entity* localPlayer, Entity* target);
 	bool smokeCheck(Vec3 src, Vec3 dst);
-	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, bool clearTarget);
+	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, bool clearTarget, GUI::GUIStruct GUIProps);
 	void doAimbot(Entity* localPlayer, Vec3* viewangles, Vec3 targetPoint);
 	void doRageAimbot(Entity* localPlayer, Vec3* viewAngles, EntList* entityList);
 	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt);
-	void RCS(Entity* localPlayer, Vec3* viewAngles);
+	//void RCS(Entity* localPlayer, Vec3* viewAngles);
 }

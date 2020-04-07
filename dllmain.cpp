@@ -139,14 +139,14 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 
 		//Aimbot
 		if (GetAsyncKeyState(VK_XBUTTON1) && GameState == 6 && localPlayer && entityList && viewAngles) {
-			aimbot::aimbotFOV(localPlayer, entityList, viewAngles, clearTarget);
+			aimbot::aimbotFOV(localPlayer, entityList, viewAngles, clearTarget, GUIProps);
 			if (clearTarget == true) clearTarget = false;
 		}
 
 		//Standalone RCS
-		if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6 && localPlayer && viewAngles) {
+		/*if (GetAsyncKeyState(VK_CAPITAL) && GameState == 6 && localPlayer && viewAngles) {
 			aimbot::RCS(localPlayer, viewAngles);
-		}
+		}*/
 
 		//Scoreboard Wallhack
 		if (GetAsyncKeyState(VK_TAB) && Vars.bScoreWall && localPlayer && entityList && GameState == 6) scoreWall(GUIProps, localPlayer, viewAngles, entityList);
@@ -156,7 +156,7 @@ DWORD WINAPI LoopThread(HMODULE hModule) {
 			for (unsigned short int i = 0; i < 32; i++) {
 				if (!entityList->entityListObjs[i].entity) continue;
 				Entity* entity = entityList->entityListObjs[i].entity;
-				if (entity->dormant() || entity->lifeState() != 0 || entity->health() < 1) continue;
+				if (entity == localPlayer || entity->dormant() || entity->lifeState() != 0 || entity->health() < 1) continue;
 				if (Vars.bRadar && entity->team() != localPlayer->team()) Radar(entity);
 				if (Vars.bESP && GlowObjectManager) ESP(localPlayer, entity, GlowObjectManager);
 			}

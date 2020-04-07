@@ -5,6 +5,7 @@
 #include <chrono>
 #include <algorithm>
 #include <vector>
+#include "scorewall.hpp"
 
 extern Globals::myGlobals Vars;
 const float pi = 3.14159265358979323846f;
@@ -83,10 +84,11 @@ namespace aimbot {
 		}
 	}
 
-	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, bool clearTarget) {
+	void aimbotFOV(Entity* localPlayer, EntList* entityList, Vec3* viewAngles, bool clearTarget, GUI::GUIStruct GUIProps) {
 		//Clear target lock
 		if (Vars.aimbotSmooth == 0) {
 			doRageAimbot(localPlayer, viewAngles, entityList);
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 			return;
 		}
 		if (clearTarget == true) {
@@ -98,7 +100,7 @@ namespace aimbot {
 			for (unsigned short int i = 0; i < 32; i++) {
 				if (entityList->entityListObjs[i].entity == NULL) continue;
 				Entity* target = entityList->entityListObjs[i].entity;
-				if (target->dormant() || target->lifeState() != 0 || target->health() < 1 || target->team() == localPlayer->team()) continue;
+				if (target == localPlayer || target->dormant() || target->lifeState() != 0 || target->health() < 1 || target->team() == localPlayer->team()) continue;
 				float dist = abs(mag3D(calcTarget(localPlayer, viewAngles, target)));
 				if (dist <= Vars.aimbotFOV) {
 					TList potentialTarget(target, dist);
@@ -114,33 +116,42 @@ namespace aimbot {
 		}
 		if (aimTarget) {
 			float dynFOV = 0.0f;
-			dynFOV = localPlayer->shotsFired() * 0.5f;
+			dynFOV = localPlayer->shotsFired() * 0.65f;
 			Vec3 targetPoint = calcTarget(localPlayer, viewAngles, aimTarget);
 			if (targetPoint.y > 180) targetPoint.y -= 360;
 			if (targetPoint.y < -180) targetPoint.y += 360;
 
 			if (aimTarget->dormant() == 0 && aimTarget->lifeState() == 0 && aimTarget->health() > 1 && abs(mag3D(targetPoint)) <= (Vars.aimbotFOV + dynFOV) && Vars.aimbotFOV > 0 && Vars.aimbotSmooth > 0) {
 				if (isVisible(localPlayer, aimTarget)) {
-					doAimbot(localPlayer, viewAngles, targetPoint);
+					//Anti shake
+					float head[2] = { 0 };
+					float neck[2] = { 0 };
+					ViewMatrix_t ViewMatrix = *(ViewMatrix_t*)(Offsets::dwClient + Offsets::dwViewMatrix);
+					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(8), head);
+					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(7), neck);
+					float dif = abs(head[0] - neck[0] + head[1] - neck[1]);
+					if (abs(mag3D(targetPoint)) > dif * 0.1f || localPlayer->shotsFired() > 0) { //Anti shake
+						doAimbot(localPlayer, viewAngles, targetPoint);
+					}
 				}
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
 
 	void doAimbot(Entity* localPlayer, Vec3* viewAngles, Vec3 targetPoint) {
 		Vec3 myAngle = *viewAngles;
 
-		if (Vars.bRCSAimbot && localPlayer->shotsFired() > 2) {
+		if (Vars.bRCSAimbot && localPlayer->shotsFired() > 1) {
 			Vec3 currentPunch = localPlayer->aimPunchAngle() * 2;
-			myAngle.x += (targetPoint.x - (currentPunch.x + RandomFloat(-1 * Vars.RCSSmoothRand, Vars.RCSSmoothRand))) / (Vars.aimbotSmooth + RandomFloat(0, Vars.aimbotSmoothRand * 0.2f));
-			myAngle.y += (targetPoint.y - (currentPunch.y + RandomFloat(-1 * Vars.RCSSmoothRand, Vars.RCSSmoothRand))) / (Vars.aimbotSmooth + RandomFloat(0, Vars.aimbotSmoothRand * 0.2f));
+			myAngle.x += (targetPoint.x - (currentPunch.x + RandomFloat(-1 * Vars.RCSSmoothRand, Vars.RCSSmoothRand))) / (Vars.aimbotSmooth * 5 + RandomFloat(0, Vars.aimbotSmoothRand * 0.2f));
+			myAngle.y += (targetPoint.y - (currentPunch.y + RandomFloat(-1 * Vars.RCSSmoothRand, Vars.RCSSmoothRand))) / (Vars.aimbotSmooth * 5 + RandomFloat(0, Vars.aimbotSmoothRand * 0.2f));
 			myAngle.x += RandomFloat(-1 * Vars.aimbotOver, Vars.aimbotOver);
 			myAngle.y += RandomFloat(-1 * Vars.aimbotOver, Vars.aimbotOver);
 		}
 		else {
-			myAngle.x += (targetPoint.x / (Vars.aimbotSmooth + RandomFloat(0, Vars.aimbotSmoothRand))) + RandomFloat(-1 * Vars.aimbotOver, Vars.aimbotOver);
-			myAngle.y += (targetPoint.y / (Vars.aimbotSmooth + RandomFloat(0, Vars.aimbotSmoothRand))) + RandomFloat(-1 * Vars.aimbotOver, Vars.aimbotOver);
+			myAngle.x += (targetPoint.x / (Vars.aimbotSmooth * 5 + RandomFloat(0, Vars.aimbotSmoothRand))) + RandomFloat(-1 * Vars.aimbotOver, Vars.aimbotOver);
+			myAngle.y += (targetPoint.y / (Vars.aimbotSmooth * 5 + RandomFloat(0, Vars.aimbotSmoothRand))) + RandomFloat(-1 * Vars.aimbotOver, Vars.aimbotOver);
 		}
 
 		if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
@@ -156,7 +167,7 @@ namespace aimbot {
 		for (unsigned short int i = 0; i < 32; i++) {
 			if (entityList->entityListObjs[i].entity == NULL) continue;
 			Entity* target = entityList->entityListObjs[i].entity;
-			if (target->dormant() || target->lifeState() != 0 || target->health() < 1 || target->team() == localPlayer->team()) continue;
+			if (target == localPlayer || target->dormant() || target->lifeState() != 0 || target->health() < 1 || target->team() == localPlayer->team()) continue;
 			float dist = abs(mag3D(calcTarget(localPlayer, viewAngles, target)));
 			if (dist <= Vars.aimbotFOV) {
 				TList potentialTarget(target, dist);
@@ -182,7 +193,7 @@ namespace aimbot {
 					Vec3 target = calcTarget(localPlayer, viewAngles, aimTarget);
 					if (target.y > 180) target.y -= 360;
 					if (target.y < -180) target.y += 360;
-					if (abs(target.x) <= (Vars.aimbotFOV) && abs(target.y) <= (Vars.aimbotFOV) && target.x != 0 && target.y != 0 && Vars.aimbotFOV > 0) {
+					if (abs(target.x) <= (Vars.aimbotFOV + dynFOV) && abs(target.y) <= (Vars.aimbotFOV + dynFOV) && target.x != 0 && target.y != 0 && Vars.aimbotFOV > 0) {
 						myAngle.x += target.x;
 						myAngle.y += target.y;
 						if (myAngle.y < -180.0f) myAngle.y = 179.99999f;
@@ -203,11 +214,10 @@ namespace aimbot {
 				}
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 
 	Vec3 calcTarget(Entity* localPlayer, Vec3* viewAngles, Entity* targetEnt) {
-		Vec3 bones = targetEnt->getBonePos(Vars.boneIndex);
+		Vec3 bones = targetEnt->getBonePos(Vars.boneIndex) + targetEnt->velocity() * 0.0078125f;
 		Vec3 myeyes = localPlayer->origin() + localPlayer->viewOffset();
 		Vec3 aimDest = calcAngle3D(myeyes, bones);
 
@@ -217,7 +227,7 @@ namespace aimbot {
 		return diff;
 	}
 
-	void RCS(Entity* localPlayer, Vec3* viewAngles) {
+	/*void RCS(Entity* localPlayer, Vec3* viewAngles) {
 		if (localPlayer->shotsFired() > 1) {
 			Vec3 currentPunch = localPlayer->aimPunchAngle() * 2;
 			Vec3 myAngle = *viewAngles + oldAngle - currentPunch;
@@ -232,6 +242,6 @@ namespace aimbot {
 		else {
 			oldAngle = { 0, 0, 0 };
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	}
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}*/
 }
