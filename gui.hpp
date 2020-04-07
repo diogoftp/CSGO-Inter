@@ -30,6 +30,6 @@ namespace GUI {
 	void CleanupDeviceD3D();
 	void ResetDevice();
 	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	void windowLoop(HWND hwnd, MSG msg, Globals::myGlobals* Vars, GUIStruct* GUIProps);
+	void windowLoop(Globals::myGlobals* Vars, GUIStruct* GUIProps);
 	
 }
