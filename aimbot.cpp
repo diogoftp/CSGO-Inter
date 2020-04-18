@@ -125,12 +125,12 @@ namespace aimbot {
 			if (aimTarget->dormant() == 0 && aimTarget->lifeState() == 0 && aimTarget->health() > 1 && abs(mag3D(targetPoint)) <= (Vars.aimbotFOV + dynFOV) && Vars.aimbotFOV > 0 && Vars.aimbotSmooth > 0) {
 				if (isVisible(localPlayer, aimTarget)) {
 					//Anti shake
-					float head[2] = { 0 };
 					float neck[2] = { 0 };
+					float chest[2] = { 0 };
 					ViewMatrix_t ViewMatrix = *(ViewMatrix_t*)(Offsets::dwClient + Offsets::dwViewMatrix);
-					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(8), head);
 					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(7), neck);
-					float dif = abs(head[0] - neck[0] + head[1] - neck[1]); //Head to neck distance aspect ratio
+					WorldToScreen(GUIProps, ViewMatrix, aimTarget->getBonePos(6), chest);
+					float dif = abs(neck[0] - chest[0] + neck[1] - chest[1]) * 0.8f; //Neck to chest distance aspect ratio
 					if (abs(mag3D(targetPoint)) > dif * 0.1f || localPlayer->shotsFired() > 0) { //Anti shake, 0.1f is a magic number
 						doAimbot(localPlayer, viewAngles, targetPoint);
 					}

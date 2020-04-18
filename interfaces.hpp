@@ -21,7 +21,6 @@ namespace Interfaces {
 class CInterface {
 public:
 	Interfaces::InstantiateInterface Interface; //0x0000
-	char* InterfaceName; //0x0004 
-	CInterface* NextInterface; //0x0008 
-
+	char* InterfaceName; //0x0004
+	CInterface* NextInterface; //0x0008
 };//Size=0x000C

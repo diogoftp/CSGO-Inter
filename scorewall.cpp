@@ -10,7 +10,7 @@ float Dist3D(Vec3 myCoords, Vec3 enemyCoords) {
 }
 
 bool WorldToScreen(GUI::GUIStruct GUIProps, ViewMatrix_t matrix, Vec3 pos, float screen[]) {
-	float clipCoords[16];
+	float clipCoords[4];
 	clipCoords[0] = pos.x * matrix.matrix[0] + pos.y * matrix.matrix[1] + pos.z * matrix.matrix[2] + matrix.matrix[3];
 	clipCoords[1] = pos.x * matrix.matrix[4] + pos.y * matrix.matrix[5] + pos.z * matrix.matrix[6] + matrix.matrix[7];
 	clipCoords[2] = pos.x * matrix.matrix[8] + pos.y * matrix.matrix[9] + pos.z * matrix.matrix[10] + matrix.matrix[11];

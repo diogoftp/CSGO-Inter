@@ -23,5 +23,4 @@ namespace Globals {
 		boneIndex = 7;
 		}
 	};
-	
 }

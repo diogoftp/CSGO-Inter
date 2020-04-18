@@ -1,14 +1,20 @@
 #include "hooks.hpp"
-#include <vector>
-
-//#include "offsets.hpp"
-#include "SDK/SDK.hpp"
 #include "vars.hpp"
+#include "aimbot.hpp"
+#include <vector>
 
 extern Globals::myGlobals Vars;
 
 namespace Hooks {
-	/*bool WorldToScreen2(ViewMatrix_t matrix, Vec3 pos, float screen[]) {
+	void Circle(LPDIRECT3DDEVICE9 pDevice, int x, int y, int radius, int points, D3DCOLOR colour) {
+		SD3DVertex* pVertex = new SD3DVertex[points + 1];
+		for (int i = 0; i <= points; i++) pVertex[i] = { x + radius * cos(D3DX_PI * (i / (points / 2.0f))), y - radius * sin(D3DX_PI * (i / (points / 2.0f))), 0.0f, 1.0f, colour };
+		pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+		pDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, points, pVertex, sizeof(SD3DVertex));
+		delete[] pVertex;
+	}
+
+	bool WorldToScreen2(ViewMatrix_t matrix, Vec3 pos, float screen[]) {
 		float clipCoords[4];
 		clipCoords[0] = pos.x * matrix.matrix[0] + pos.y * matrix.matrix[1] + pos.z * matrix.matrix[2] + matrix.matrix[3];
 		clipCoords[1] = pos.x * matrix.matrix[4] + pos.y * matrix.matrix[5] + pos.z * matrix.matrix[6] + matrix.matrix[7];
@@ -22,10 +28,10 @@ namespace Hooks {
 		NDC.y = clipCoords[1] / clipCoords[3];
 		NDC.z = clipCoords[2] / clipCoords[3];
 
-		screen[0] = (1920 / 2 * NDC.x) + (NDC.x + 1920 / 2);
+		screen[0] = (1080 / 2 * NDC.x) + (NDC.x + 1080 / 2);
 		screen[1] = -(1080 / 2 * NDC.y) + (NDC.y + 1080 / 2);
 		return true;
-	}*/
+	}
 
 	typedef HRESULT(APIENTRY* tEndScene)(LPDIRECT3DDEVICE9 pDevice);
 	tEndScene oEndScene = nullptr;
@@ -34,7 +40,7 @@ namespace Hooks {
 	void* d3d9Device[119];
 
 	HRESULT APIENTRY hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
-		/*EntList* entityList = (EntList*)(Offsets::dwClient + Offsets::dwEntityList);
+		EntList* entityList = (EntList*)(Offsets::dwClient + Offsets::dwEntityList);
 		uintptr_t ClientState = *(uintptr_t*)(Offsets::dwEngine + Offsets::dwClientState);
 		int GameState = *(uintptr_t*)(ClientState + Offsets::dwClientState_State);
 		Vec3* viewAngles = (Vec3*)(ClientState + Offsets::dwClientState_ViewAngles);
@@ -46,20 +52,20 @@ namespace Hooks {
 				Entity* target = entityList->entityListObjs[i].entity;
 				if (target->dormant() || target->lifeState() != 0 || target->health() < 1 || target == localPlayer) continue;
 				float EnemyXY[2] = { 0 };
-				float head[2] = { 0 };
 				float neck[2] = { 0 };
-				WorldToScreen2(ViewMatrix, target->getBonePos(8), head);
+				float chest[2] = { 0 };
 				WorldToScreen2(ViewMatrix, target->getBonePos(7), neck);
-				float dif = abs(head[0] - neck[0] + head[1] - neck[1]);
+				WorldToScreen2(ViewMatrix, target->getBonePos(6), chest);
+				float dif = abs(neck[0] - chest[0] + neck[1] - chest[1]) * 0.8f;
 				if (WorldToScreen2(ViewMatrix, target->getBonePos(Vars.boneIndex), EnemyXY)) {
-					D3DRECT BarRect = { (int)EnemyXY[0] - dif, (int)EnemyXY[1] - dif, (int)EnemyXY[0] + dif, (int)EnemyXY[1] + dif };
-					pDevice->Clear(1, &BarRect, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1, 1, 1, 1), 0.0f, 0);
+					Circle(pDevice, (int)EnemyXY[0], (int)EnemyXY[1], (int)dif, 20, D3DCOLOR_RGBA(255, 0, 0, 255));
+					//D3DRECT BarRect = { (int)EnemyXY[0] - dif, (int)EnemyXY[1] - dif, (int)EnemyXY[0] + dif, (int)EnemyXY[1] + dif };
+					//pDevice->Clear(1, &BarRect, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1, 1, 1, 1), 0.0f, 0);
 				}
 			}	
-		}*/
-
-		D3DRECT BarRect = { 300, 300, 600, 600 };
-		pDevice->Clear(1, &BarRect, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1, 1, 1, 1), 0.0f, 0);
+		}
+		//D3DRECT BarRect = { 300, 300, 600, 600 };
+		//pDevice->Clear(1, &BarRect, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1, 1, 1, 1), 0.0f, 0);
 		return oEndScene(pDevice);
 	}
 

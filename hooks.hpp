@@ -1,19 +1,23 @@
 #pragma once
+#include "SDK/SDK.hpp"
 #include <Windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
 
-#include "SDK/SDK.hpp"
-
 namespace Hooks {
+	struct SD3DVertex {
+		float x, y, z, rhw;
+		DWORD colour;
+	};
+
+	struct ViewMatrix_t {
+		float matrix[16];
+	};
+
 	void Setup();
 	void Shutdown();
 
-	/*typedef struct {
-		float matrix[16];
-	} ViewMatrix_t;
-
-	bool WorldToScreen2(ViewMatrix_t matrix, Vec3 pos, float screen[]);*/
+	bool WorldToScreen2(ViewMatrix_t matrix, Vec3 pos, float screen[]);
 
 	bool Detour32(char* src, char* dst, const intptr_t len);
 	char* TrampHook32(char* src, char* dst, const intptr_t len);

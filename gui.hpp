@@ -1,9 +1,10 @@
 #pragma once
-#include <d3d9.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_win32.h"
 #include "vars.hpp"
+#include <d3d9.h>
+
 #define DIRECTINPUT_VERSION 0x0800
 
 extern LPDIRECT3D9              g_pD3D;
@@ -31,5 +32,4 @@ namespace GUI {
 	void ResetDevice();
 	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void windowLoop(Globals::myGlobals* Vars, GUIStruct* GUIProps);
-	
 }

@@ -2,7 +2,7 @@
 #include "SDK/SDK.hpp"
 #include "gui.hpp"
 
-struct TList {
+struct TList{
 	Entity* target = nullptr;
 	float dist = 0.0f;
 

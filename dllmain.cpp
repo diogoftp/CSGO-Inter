@@ -1,6 +1,8 @@
-#include <time.h>
-#include <thread>
-#include <chrono>
+#include "gui.hpp"
+#include "ESP.hpp"
+#include "radar.hpp"
+#include "aimbot.hpp"
+#include "scorewall.hpp"
 
 #include "SDK/SDK.hpp"
 #include "xor.hpp"
@@ -9,11 +11,9 @@
 //#include "hooks.hpp"
 #include "vars.hpp"
 
-#include "gui.hpp"
-#include "ESP.hpp"
-#include "radar.hpp"
-#include "aimbot.hpp"
-#include "scorewall.hpp"
+#include <time.h>
+#include <thread>
+#include <chrono>
 
 //#define DEBUG1 1
 
